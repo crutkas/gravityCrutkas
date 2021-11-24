@@ -58,9 +58,12 @@ export default {
 // The `after` argument is used to set the cursor for
 // query pagination in cases where the repository has a lot of issues.
 async function getIssues(token: string | null, after: string | null) {
+  console.log("Trying to get issues...");
+
   const headers = {
     Authorization: `bearer ${token}`,
   };
+
   let body = {};
 
   if (after) {
@@ -80,6 +83,7 @@ async function getIssues(token: string | null, after: string | null) {
     headers: headers,
   });
 
+  console.log(`About to submit a request with the following parameters: ${body}`)
   const data = await response.json();
   return data;
 }

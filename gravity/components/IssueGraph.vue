@@ -84,7 +84,7 @@ function createForceNetwork(nodes, edges) {
        .append("rect")
        .classed("rect", true)
        .attr("width", 600)
-       .attr("height", 400);
+       .attr("height", 400)
         .selectAll("line")
         .data(edges)
         .enter()

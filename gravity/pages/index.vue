@@ -153,7 +153,11 @@ function computeLinks (nodeContainer: Array<Edge[]> | null)
       });
     });
 
-    return JSON.stringify(relationships); 
+    let filteredRelationships = relationships.filter(function (entity) {
+      return (entity[0] != null && entity[1] != null)
+    });
+
+    return JSON.stringify(filteredRelationships); 
   }
   else
   {

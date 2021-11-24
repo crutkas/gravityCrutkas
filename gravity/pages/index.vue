@@ -37,10 +37,10 @@ export default {
         
         console.log(typeof issues)
 
-        let relationships = computeLinks(sanitizedIssues);
+        // let relationships = computeLinks(sanitizedIssues);
 
         return {
-          issueData: JSON.stringify(relationships),
+          issueData: JSON.stringify(sanitizedIssues),
         };
       } else {
         return {
@@ -92,27 +92,27 @@ async function getIssues(token: string | null, after: string | null) {
   return data;
 }
 
-function computeLinks (nodeContainer: Object | null)
-{
-  let relationships = [];
+// function computeLinks (nodeContainer: Object | null)
+// {
+//   let relationships = [];
 
-  if (nodeContainer)
-  {
-    nodeContainer.forEach(function (nodeBlock) {
-      // Here we now have an array of node objects
-      nodeBlock.forEach(function(node) {
-        let number = node.node.number;
-        node.node.nodes.forEach(function (referenceNode) {
-          relationships.push([number, referenceNode.source.number]);
-        });
-      });
-    });
+//   if (nodeContainer)
+//   {
+//     nodeContainer.forEach(function (nodeBlock) {
+//       // Here we now have an array of node objects
+//       nodeBlock.forEach(function(node) {
+//         let number = node.node.number;
+//         node.node.nodes.forEach(function (referenceNode) {
+//           relationships.push([number, referenceNode.source.number]);
+//         });
+//       });
+//     });
 
-    return JSON.stringify(relationships); 
-  }
-  else
-  {
-    return { "error": "Could not compute links." }
-  }
-}
+//     return JSON.stringify(relationships); 
+//   }
+//   else
+//   {
+//     return { "error": "Could not compute links." }
+//   }
+// }
 </script>

@@ -146,8 +146,8 @@ function computeLinks (nodeContainer: Array<Edge[]> | null)
     nodeContainer.forEach(function (nodeBlock) {
       // Here we now have an array of node objects
       nodeBlock.forEach(function(node) {
-        let number = node.node.number;
-        node.node.nodes.forEach(function (referenceNode) {
+        let number = node.number;
+        node.timelineItems.nodes.forEach(function (referenceNode) {
           relationships.push([number, referenceNode.source.number]);
         });
       });

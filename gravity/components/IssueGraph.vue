@@ -1,6 +1,6 @@
 <!-- Please remove this file from your project -->
 <template>
-  <div id="graphContainer">
+  <div class="svg-container">
     <svg id="issueGraph"></svg>
   </div>
 </template>
@@ -74,19 +74,8 @@ function createForceNetwork(nodes, edges) {
         })
         .on("tick", updateNetwork);
 
-    d3.select("svg").selectAll("line")
-        .data(edges)
-        .enter()
-        .append("line")
-        .style("stroke-width", "1px")
-        .style("stroke", "#996666");
-
-    d3.select("div#graphContainer")
-       .append("div")
-       // Container class to make it responsive.
-       .classed("svg-container", true) 
-       .append("svg")
-       // Responsive SVG needs these 2 attributes and no width and height attr.
+    d3.select("svg")
+    // Responsive SVG needs these 2 attributes and no width and height attr.
        .attr("preserveAspectRatio", "xMinYMin meet")
        .attr("viewBox", "0 0 600 400")
        // Class to make it responsive.
@@ -96,6 +85,12 @@ function createForceNetwork(nodes, edges) {
        .classed("rect", true)
        .attr("width", 600)
        .attr("height", 400);
+        .selectAll("line")
+        .data(edges)
+        .enter()
+        .append("line")
+        .style("stroke-width", "1px")
+        .style("stroke", "#996666");
 
     var nodeEnter = d3.select("svg").selectAll("g.node")
         .data(nodes)
@@ -226,7 +221,7 @@ function createForceNetwork(nodes, edges) {
     vertical-align: top;
     overflow: hidden;
   }
-  
+
   .svg-content-responsive {
     display: inline-block;
     position: absolute;

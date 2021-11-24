@@ -85,7 +85,7 @@ export default {
         let relationships = computeLinks(sanitizedIssues);
 
         return {
-          issueData: JSON.stringify(sanitizedIssues),
+          issueData: JSON.stringify(relationships),
         };
       } else {
         return {

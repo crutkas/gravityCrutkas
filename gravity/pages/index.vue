@@ -83,7 +83,6 @@ export default {
         }
 
         let relationships = computeLinks(sanitizedIssues);
-        let network = computeNetwork(relationships);
 
         return {
           issueData: relationships,
@@ -157,19 +156,11 @@ function computeLinks (nodeContainer: Array<Edge[]> | null)
       return (entity[0] != null && entity[1] != null)
     });
 
-    return relationships.map(e => e.join(",")).join("\n"); 
+    return relationships.map(e:any => e.join(",")).join("\n"); 
   }
   else
   {
     return { "error": "Could not compute links." }
-  }
-}
-
-function computeNetwork(relationships: Array<object> | null){
-  if (relationships) {
-
-  } else {
-    return { "error": "No relationships to compute network from." }
   }
 }
 </script>

@@ -6,6 +6,8 @@
 </template>
 
 <script>
+const d3 = require("d3");
+
 export default {
   props: {
     issueData: String,
@@ -187,5 +189,6 @@ function createForceNetwork(nodes, edges) {
             });
 
     }
+  }
 
 </script>

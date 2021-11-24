@@ -139,7 +139,7 @@ async function getIssues(token: string | null, after: string | null) {
 
 function computeLinks (nodeContainer: Array<Edge[]> | null)
 {
-  let relationships = any[];
+  let relationships:any = [];
 
   if (nodeContainer)
   {

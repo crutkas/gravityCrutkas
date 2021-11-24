@@ -59,7 +59,7 @@ async function getIssues(token: string | null, after: string | null) {
   const headers = {
     Authorization: `bearer ${token}`,
   };
-  const body = {};
+  let body = {};
 
   if (after) {
     body = {

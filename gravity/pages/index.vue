@@ -82,7 +82,7 @@ export default {
           }
         }
 
-        console.log(typeof issues[0])
+        console.log(typeof sanitizedIssues[0])
 
         // let relationships = computeLinks(sanitizedIssues);
 

@@ -17,7 +17,7 @@ export default {
   },
   methods: {
     getData(issueData) {
-      var data = d3.csvParse(issueData);
+      var data = d3.csv.parse(issueData);
       createNetwork(data);
     }
   },
@@ -58,7 +58,7 @@ function createForceNetwork(nodes, edges) {
 
     //create a network from an edgelist
 
-    var force = d3.force().nodes(nodes).links(edges)
+    var force = d3.layout.force().nodes(nodes).links(edges)
         .size([500, 500])
         .charge(function(d) {
             return Math.min(-100, d.weight * -50)

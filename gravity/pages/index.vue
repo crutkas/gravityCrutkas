@@ -17,7 +17,7 @@ export default {
         let sanitizedIssues = {}
 
         // Initial call - let's get the first batch.
-        issues = await getIssues(secrets.gitHub?.bearerToken)
+        issues = await getIssues(secrets.gitHub?.bearerToken, null)
 
         // See if we have a stack of referenced issues
         if (issues.data.repository.issues.edges)

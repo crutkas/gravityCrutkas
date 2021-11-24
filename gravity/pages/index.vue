@@ -147,7 +147,7 @@ function computeLinks (nodeContainer: Array<Edge[]> | null)
       nodeBlock.forEach(function(node) {
         let number = node.node.number;
         node.node.timelineItems.nodes.forEach(function (referenceNode) {
-          relationships.push([number, referenceNode.source.number, 1]);
+          relationships.push([number, referenceNode.source.number, 4]);
         });
       });
     });

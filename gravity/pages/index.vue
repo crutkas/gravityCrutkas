@@ -68,7 +68,7 @@ async function getIssues(token: string | null, after: string | null) {
 
   if (after) {
     body = {
-      query: `query {repository(owner:"microsoft",name:"powertoys"){issues(first:100, states:OPEN, after:${after}){totalCount pageInfo{startCursor hasNextPage endCursor}edges{node{title url timelineItems(first:200,itemTypes:CROSS_REFERENCED_EVENT){totalCount pageInfo{startCursor hasNextPage endCursor}nodes{...on CrossReferencedEvent{source{...on Issue{number}}}}}}}}}}`,
+      query: `query {repository(owner:"microsoft",name:"powertoys"){issues(first:100, states:OPEN, after:"${after}"){totalCount pageInfo{startCursor hasNextPage endCursor}edges{node{title url timelineItems(first:200,itemTypes:CROSS_REFERENCED_EVENT){totalCount pageInfo{startCursor hasNextPage endCursor}nodes{...on CrossReferencedEvent{source{...on Issue{number}}}}}}}}}}`,
     };
   } else {
     body = {

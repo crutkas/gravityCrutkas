@@ -1,7 +1,7 @@
 <!-- Please remove this file from your project -->
 <template>
   <div>
-    <svg id="issueGraph" width="600" height="600"></svg>
+    <svg id="issueGraph" width="900" height="900"></svg>
   </div>
 </template>
 
@@ -18,6 +18,8 @@ export default {
   methods: {
     getData(issueData) {
       var data = d3.csv.parse(issueData);
+      console.log(data);
+      
       createNetwork(data);
     }
   },

@@ -17,6 +17,7 @@ export default {
   },
   methods: {
     getData(issueData) {
+      console.log(issueData);
       var data = d3.csv.parse(issueData);
       console.log(data);
 
@@ -58,7 +59,7 @@ function createNetwork(edgelist) {
     console.log(nodes)
     console.log("Edges")
     console.log(edges)
-    
+
     createForceNetwork(nodes, edges);
 }
 

@@ -6,6 +6,53 @@
 import { getSecrets, NetlifySecrets } from "@netlify/functions";
 import { Context } from "@nuxt/types";
 
+export interface Container {
+    data: Data;
+}
+
+export interface Data {
+    repository: Repository;
+}
+
+export interface Repository {
+    issues: Issues;
+}
+
+export interface Issues {
+    totalCount: number;
+    pageInfo:   PageInfo;
+    edges:      Edge[];
+}
+
+export interface Edge {
+    node: EdgeNode;
+}
+
+export interface EdgeNode {
+    number:        number;
+    timelineItems: TimelineItems;
+}
+
+export interface TimelineItems {
+    totalCount: number;
+    pageInfo:   PageInfo;
+    nodes:      NodeElement[];
+}
+
+export interface NodeElement {
+    source: Source;
+}
+
+export interface Source {
+    number?: number;
+}
+
+export interface PageInfo {
+    startCursor: null | string;
+    hasNextPage: boolean;
+    endCursor:   null | string;
+}
+
 export default {
   async asyncData(context: Context) {
     try {
@@ -16,7 +63,7 @@ export default {
         let sanitizedIssues = [];
 
         // Initial call - let's get the first batch.
-        let issues = await getIssues(secrets.gitHub?.bearerToken, null);
+        let issues: Container = await getIssues(secrets.gitHub?.bearerToken, null);
         console.log(issues);
 
         // See if we have a stack of referenced issues
@@ -34,7 +81,7 @@ export default {
             sanitizedIssues.push(issues.data.repository.issues.edges);
           }
         }
-        
+
         console.log(typeof issues)
 
         // let relationships = computeLinks(sanitizedIssues);

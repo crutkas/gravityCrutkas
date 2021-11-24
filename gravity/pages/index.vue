@@ -139,15 +139,15 @@ async function getIssues(token: string | null, after: string | null) {
 
 function computeLinks (nodeContainer: Array<Edge[]> | null)
 {
-  let relationships = [][];
+  let relationships = any[];
 
   if (nodeContainer)
   {
     nodeContainer.forEach(function (nodeBlock) {
       // Here we now have an array of node objects
       nodeBlock.forEach(function(node) {
-        let number = node.number;
-        node.timelineItems.nodes.forEach(function (referenceNode) {
+        let number = node.node.number;
+        node.node.timelineItems.nodes.forEach(function (referenceNode) {
           relationships.push([number, referenceNode.source.number]);
         });
       });

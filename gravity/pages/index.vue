@@ -13,22 +13,22 @@ export default {
       secrets = await getSecrets();
       if (secrets.gitHub) {
         // Empty array at first - we haven't yet gotten any issues.
-        let issues = {}
-        let sanitizedIssues = {}
+        let sanitizedIssues = [];
 
         // Initial call - let's get the first batch.
-        issues = await getIssues(secrets.gitHub?.bearerToken, null)
+        let issues = await getIssues(secrets.gitHub?.bearerToken, null);
 
         // See if we have a stack of referenced issues
-        if (issues.data.repository.issues.edges)
-        {
+        if (issues.data.repository.issues.edges) {
           // Insert the current stack of issues
           sanitizedIssues.push(issues.data.repository.issues.edges);
 
           // If there is more than one page, let's get all the issues.
-          while (issues.data.repository.issues.pageInfo.hasNextPage)
-          {
-            issues = await getIssues(secrets.gitHub?.bearerToken, issues.data.repository.issues.pageInfo.endCursor);
+          while (issues.data.repository.issues.pageInfo.hasNextPage) {
+            issues = await getIssues(
+              secrets.gitHub?.bearerToken,
+              issues.data.repository.issues.pageInfo.endCursor
+            );
             sanitizedIssues.push(issues.data.repository.issues.edges);
           }
         }
@@ -59,21 +59,17 @@ async function getIssues(token: string | null, after: string | null) {
   const headers = {
     Authorization: `bearer ${token}`,
   };
-  const body = { };
+  const body = {};
 
-  if (after)
-  {
+  if (after) {
+    body = {
+      query: `query {repository(owner:"microsoft",name:"powertoys"){issues(first:100, states:OPEN, after:${after}){totalCount pageInfo{startCursor hasNextPage endCursor}edges{node{title url timelineItems(first:200,itemTypes:CROSS_REFERENCED_EVENT){totalCount pageInfo{startCursor hasNextPage endCursor}nodes{...on CrossReferencedEvent{source{...on Issue{number}}}}}}}}}}`,
+    };
+  } else {
     body = {
       query:
-        `query {repository(owner:"microsoft",name:"powertoys"){issues(first:100, states:OPEN, after:${after}){totalCount pageInfo{startCursor hasNextPage endCursor}edges{node{title url timelineItems(first:200,itemTypes:CROSS_REFERENCED_EVENT){totalCount pageInfo{startCursor hasNextPage endCursor}nodes{...on CrossReferencedEvent{source{...on Issue{number}}}}}}}}}}`,
-    }
-  }
-  else
-  {
-    body = {
-          query:
-            "query {repository(owner:\"microsoft\",name:\"powertoys\"){issues(first:100, states:OPEN){totalCount pageInfo{startCursor hasNextPage endCursor}edges{node{title url timelineItems(first:200,itemTypes:CROSS_REFERENCED_EVENT){totalCount pageInfo{startCursor hasNextPage endCursor}nodes{...on CrossReferencedEvent{source{...on Issue{number}}}}}}}}}}",
-    }
+        'query {repository(owner:"microsoft",name:"powertoys"){issues(first:100, states:OPEN){totalCount pageInfo{startCursor hasNextPage endCursor}edges{node{title url timelineItems(first:200,itemTypes:CROSS_REFERENCED_EVENT){totalCount pageInfo{startCursor hasNextPage endCursor}nodes{...on CrossReferencedEvent{source{...on Issue{number}}}}}}}}}}',
+    };
   }
 
   const response = await fetch("https://api.github.com/graphql", {

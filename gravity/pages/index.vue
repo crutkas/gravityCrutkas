@@ -83,7 +83,7 @@ async function getIssues(token: string | null, after: string | null) {
     headers: headers,
   });
 
-  console.log(`About to submit a request with the following parameters: ${body}`)
+  console.log(`About to submit a request with the following parameters: ${JSON.stringify(body)}`)
   const data = await response.json();
   return data;
 }

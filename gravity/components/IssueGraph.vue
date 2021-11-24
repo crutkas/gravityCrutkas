@@ -1,7 +1,7 @@
 <!-- Please remove this file from your project -->
 <template>
-  <div>
-    <svg id="issueGraph" width="900" height="900"></svg>
+  <div id="graphContainer">
+    <svg id="issueGraph"></svg>
   </div>
 </template>
 
@@ -80,6 +80,22 @@ function createForceNetwork(nodes, edges) {
         .append("line")
         .style("stroke-width", "1px")
         .style("stroke", "#996666");
+
+    d3.select("div#graphContainer")
+       .append("div")
+       // Container class to make it responsive.
+       .classed("svg-container", true) 
+       .append("svg")
+       // Responsive SVG needs these 2 attributes and no width and height attr.
+       .attr("preserveAspectRatio", "xMinYMin meet")
+       .attr("viewBox", "0 0 600 400")
+       // Class to make it responsive.
+       .classed("svg-content-responsive", true)
+       // Fill with a rectangle for visualization.
+       .append("rect")
+       .classed("rect", true)
+       .attr("width", 600)
+       .attr("height", 400);
 
     var nodeEnter = d3.select("svg").selectAll("g.node")
         .data(nodes)
@@ -200,3 +216,21 @@ function createForceNetwork(nodes, edges) {
   }
 
 </script>
+
+<style type="text/css">
+  .svg-container {
+    display: inline-block;
+    position: relative;
+    width: 100%;
+    padding-bottom: 100%; /* aspect ratio */
+    vertical-align: top;
+    overflow: hidden;
+  }
+  
+  .svg-content-responsive {
+    display: inline-block;
+    position: absolute;
+    top: 10px;
+    left: 0;
+  }
+</style>

@@ -34,6 +34,8 @@ export default {
             sanitizedIssues.push(issues.data.repository.issues.edges);
           }
         }
+        
+        console.log(typeof issues)
 
         let relationships = computeLinks(sanitizedIssues);
 
@@ -90,7 +92,7 @@ async function getIssues(token: string | null, after: string | null) {
   return data;
 }
 
-function computeLinks (nodeContainer: object | null)
+function computeLinks (nodeContainer: Object | null)
 {
   let relationships = [];
 

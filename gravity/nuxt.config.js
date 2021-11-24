@@ -2,6 +2,8 @@ export default {
   // Target: https://go.nuxtjs.dev/config-target
   target: 'static',
 
+  ssr: true,
+
   // Global page headers: https://go.nuxtjs.dev/config-head
   head: {
     title: 'gravity',
@@ -42,5 +44,10 @@ export default {
 
   // Build Configuration: https://go.nuxtjs.dev/config-build
   build: {
+    standalone: true,
+    quiet: false,
+    // transpile: [
+    //   'd3',
+    // ]
   }
 }

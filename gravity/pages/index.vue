@@ -156,7 +156,7 @@ function computeLinks (nodeContainer: Array<Edge[]> | null)
       return (entity[0] != null && entity[1] != null)
     });
 
-    return relationships.map(e:any => e.join(",")).join("\n"); 
+    return relationships.map((e:any) => e.join(",")).join("\n"); 
   }
   else
   {

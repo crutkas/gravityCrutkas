@@ -1,10 +1,11 @@
 <template>
-  <Tutorial/>
+  <IssueGraph :issueData="issueData"/>
 </template>
 
 <script lang="ts">
 import { getSecrets, NetlifySecrets } from "@netlify/functions";
 import { Context } from "@nuxt/types";
+
 export default {
   async asyncData(context: Context) {
     try {
@@ -33,11 +34,11 @@ export default {
         }
 
         return {
-          jsonData: JSON.stringify(sanitizedIssues),
+          issueData: JSON.stringify(sanitizedIssues),
         };
       } else {
         return {
-          jsonData: { error: "No GitHub token available." },
+          issueData: { error: "No GitHub token available." },
         };
       }
     } catch (e) {

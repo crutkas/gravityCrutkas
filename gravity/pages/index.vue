@@ -35,8 +35,10 @@ export default {
           }
         }
 
+        let relationships = computeLinks(sanitizedIssues);
+
         return {
-          issueData: JSON.stringify(sanitizedIssues),
+          issueData: JSON.stringify(relationships),
         };
       } else {
         return {
@@ -68,12 +70,12 @@ async function getIssues(token: string | null, after: string | null) {
 
   if (after) {
     body = {
-      query: `query {repository(owner:"microsoft",name:"powertoys"){issues(first:100, states:OPEN, after:"${after}"){totalCount pageInfo{startCursor hasNextPage endCursor}edges{node{title url timelineItems(first:200,itemTypes:CROSS_REFERENCED_EVENT){totalCount pageInfo{startCursor hasNextPage endCursor}nodes{...on CrossReferencedEvent{source{...on Issue{number}}}}}}}}}}`,
+      query: `query {repository(owner:"microsoft",name:"powertoys"){issues(first:100, states:OPEN, after:"${after}"){totalCount pageInfo{startCursor hasNextPage endCursor}edges{node{number timelineItems(first:200,itemTypes:CROSS_REFERENCED_EVENT){totalCount pageInfo{startCursor hasNextPage endCursor}nodes{...on CrossReferencedEvent{source{...on Issue{number}}}}}}}}}}`,
     };
   } else {
     body = {
       query:
-        'query {repository(owner:"microsoft",name:"powertoys"){issues(first:100, states:OPEN){totalCount pageInfo{startCursor hasNextPage endCursor}edges{node{title url timelineItems(first:200,itemTypes:CROSS_REFERENCED_EVENT){totalCount pageInfo{startCursor hasNextPage endCursor}nodes{...on CrossReferencedEvent{source{...on Issue{number}}}}}}}}}}',
+        'query {repository(owner:"microsoft",name:"powertoys"){issues(first:100, states:OPEN){totalCount pageInfo{startCursor hasNextPage endCursor}edges{node{number timelineItems(first:200,itemTypes:CROSS_REFERENCED_EVENT){totalCount pageInfo{startCursor hasNextPage endCursor}nodes{...on CrossReferencedEvent{source{...on Issue{number}}}}}}}}}}',
     };
   }
 
@@ -86,5 +88,29 @@ async function getIssues(token: string | null, after: string | null) {
   console.log(`About to submit a request with the following parameters: ${JSON.stringify(body)}`)
   const data = await response.json();
   return data;
+}
+
+function computeLinks (nodeContainer: object | null)
+{
+  let relationships = [];
+
+  if (nodeContainer)
+  {
+    nodeContainer.forEach(function (nodeBlock) {
+      // Here we now have an array of node objects
+      nodeBlock.forEach(function(node) {
+        let number = node.node.number;
+        node.node.nodes.forEach(function (referenceNode) {
+          relationships.push([number, referenceNode.source.number]);
+        });
+      });
+    });
+
+    return JSON.stringify(relationships); 
+  }
+  else
+  {
+    return { "error": "Could not compute links." }
+  }
 }
 </script>

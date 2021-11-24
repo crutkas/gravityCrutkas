@@ -19,7 +19,7 @@ export default {
     getData(issueData) {
       var data = d3.csv.parse(issueData);
       console.log(data);
-      
+
       createNetwork(data);
     }
   },
@@ -53,6 +53,12 @@ function createNetwork(edgelist) {
             });
         }
     });
+
+    console.log("Nodes")
+    console.log(nodes)
+    console.log("Edges")
+    console.log(edges)
+    
     createForceNetwork(nodes, edges);
 }
 

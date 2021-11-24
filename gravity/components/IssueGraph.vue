@@ -17,7 +17,7 @@ export default {
   },
   methods: {
     getData(issueData) {
-      var data = d3.csv.parse(issueData);
+      var data = d3.csvParse(issueData);
       createNetwork(data);
     }
   },

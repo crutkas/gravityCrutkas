@@ -83,9 +83,10 @@ export default {
         }
 
         let relationships = computeLinks(sanitizedIssues);
+        let network = computeNetwork(relationships);
 
         return {
-          issueData: JSON.stringify(relationships),
+          issueData: relationships,
         };
       } else {
         return {
@@ -147,7 +148,7 @@ function computeLinks (nodeContainer: Array<Edge[]> | null)
       nodeBlock.forEach(function(node) {
         let number = node.node.number;
         node.node.timelineItems.nodes.forEach(function (referenceNode) {
-          relationships.push([number, referenceNode.source.number]);
+          relationships.push([number, referenceNode.source.number, 1]);
         });
       });
     });
@@ -156,11 +157,19 @@ function computeLinks (nodeContainer: Array<Edge[]> | null)
       return (entity[0] != null && entity[1] != null)
     });
 
-    return JSON.stringify(filteredRelationships); 
+    return relationships.map(e => e.join(",")).join("\n"); 
   }
   else
   {
     return { "error": "Could not compute links." }
+  }
+}
+
+function computeNetwork(relationships: Array<object> | null){
+  if (relationships) {
+
+  } else {
+    return { "error": "No relationships to compute network from." }
   }
 }
 </script>

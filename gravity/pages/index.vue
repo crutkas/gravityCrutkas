@@ -1,6 +1,8 @@
 <template>
-  <IssueGraph :issueData="issueData"/>
-  <IssueSummary :issueSummary="issueSummary"/>
+  <div>
+    <IssueGraph :issueData="issueData"/>
+    <IssueSummary :issueSummary="issueSummary"/>
+  </div>
 </template>
 
 <script lang="ts">

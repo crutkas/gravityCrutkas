@@ -115,19 +115,7 @@ function createForceNetwork(nodes, edges) {
     nodeEnter.append("text")
         .style("text-anchor", "middle")
         .attr("y", 2)
-        .style("stroke-width", "1px")
-        .style("stroke-opacity", 0.75)
-        .style("stroke", "#000")
-        .style("font-size", "8px")
-        .text(function(d) {
-            return d.id
-        })
-        .style("pointer-events", "none")
-
-    nodeEnter.append("text")
-        .style("text-anchor", "middle")
-        .attr("y", 2)
-        .style("font-size", "8px")
+        .style("font-size", "12px")
         .text(function(d) {
             return d.id
         })

@@ -84,8 +84,10 @@ function createForceNetwork(nodes, edges) {
        .append("rect")
        .classed("rect", true)
        .attr("width", 1300)
-       .attr("height", 1300)
-        .selectAll("line")
+       .attr("height", 1300);
+
+    d3.select("svg")
+      .selectAll("line")
         .data(edges)
         .enter()
         .append("line")

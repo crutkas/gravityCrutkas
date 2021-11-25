@@ -2,7 +2,7 @@
   <div>
         <b-table :items="issueSummary" :fields="fields" striped hover>
           <template #cell(title)="data">
-            <a :href="{{ data.url }}">{{ data.title }}</a>
+            <b-link :href="data.item.url">data.item.title</b-link>
           </template>
         </b-table>
   </div>

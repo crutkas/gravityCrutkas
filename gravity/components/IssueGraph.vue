@@ -36,16 +36,14 @@ function createNetwork(edgelist) {
         if (!nodeHash[edge.source]) {
             nodeHash[edge.source] = {
                 id: edge.source,
-                label: edge.source,
-                group: edgelist.nodes.find(x => x.id === edge.source).group
+                label: edgelist.nodes.find(x => x.id === edge.source).group
             };
             nodes.push(nodeHash[edge.source]);
         }
         if (!nodeHash[edge.target]) {
             nodeHash[edge.target] = {
                 id: edge.target,
-                label: edge.target,
-                group: edgelist.nodes.find(x => x.id === edge.source).group
+                label: edgelist.nodes.find(x => x.id === edge.source).group
             };
             nodes.push(nodeHash[edge.target]);
         }

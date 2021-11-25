@@ -6,6 +6,19 @@
 
 <script>
 export default {
-  props: [ 'issueSummary' ]
+  props: [ 'issueSummary' ],
+  data() {
+      return {
+        fields: [
+          {
+            key: 'title',
+            sortable: true
+          },
+          {
+            key: 'referencedIn',
+            sortable: false
+          },
+        ]}
+  };
 }
 </script>

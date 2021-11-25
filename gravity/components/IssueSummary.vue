@@ -2,7 +2,7 @@
   <div>
         <b-table :items="issueSummary" :fields="fields" striped hover>
           <template #cell(title)="data">
-            <a href="{{data.url}}">{{data.title}}</a>
+            <a :href="{{ data.url }}">{{ data.title }}</a>
           </template>
         </b-table>
   </div>
@@ -20,7 +20,7 @@ export default {
           },
           {
             key: 'referencedIn',
-            sortable: false
+            sortable: true
           },
         ]}
   },

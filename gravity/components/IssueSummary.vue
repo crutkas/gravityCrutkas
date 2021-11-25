@@ -1,6 +1,10 @@
 <template>
   <div>
-        <b-table :items="issueSummary" :fields="fields" striped hover />
+        <b-table :items="issueSummary" :fields="fields" striped hover>
+          <template #cell(title)="data">
+            <a href="{{data.url}}">{{data.title}}</a>
+          </template>
+        </b-table>
   </div>
 </template>
 
@@ -19,6 +23,6 @@ export default {
             sortable: false
           },
         ]}
-  };
+  },
 }
 </script>

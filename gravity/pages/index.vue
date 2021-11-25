@@ -71,6 +71,17 @@ export interface Relationship {
   weight: number;
 }
 
+export interface BarebonesNode {
+  id: string;
+  group: number;
+}
+
+export interface D3DataContainer {
+  nodes: Array<BarebonesNode>;
+  links: Array<Relationship>;
+}
+
+
 export default {
   async asyncData(context: Context) {
     try {
@@ -101,10 +112,16 @@ export default {
         }
 
         let relationships = computeLinks(sanitizedIssues);
+        let nodeStates = computeNodeStates(sanitizedIssues);
         let summaries = computeSummary(sanitizedIssues);
 
+        let d3data : D3DataContainer = {
+          nodes = nodeStates,
+          links = relationships
+        }
+
         return {
-          issueData: relationships,
+          issueData: d3data,
           issueSummary: summaries
         };
       } else {
@@ -180,6 +197,36 @@ function computeSummary(nodeContainer: Array<Edge[]> | null){
   return summaryItems;
 }
 
+function computeNodeStates (nodeContainer: Array<Edge[]> | null)
+{
+  let nodeStates : Array<BarebonesNode> = []
+
+  if (nodeContainer) {
+    nodeContainer.forEach(function (nodeBlock) {
+      nodeBlock.forEach(function(node) {
+        let topLevelNode : BarebonesNode = {
+          id = node.node.number,
+          group = equalsIgnoringCase(node.node.state , "OPEN") ? 1 : 0
+        };
+
+        nodeStates.push (topLevelNode);
+
+        node.node.timelineItems.nodes.forEach(function (referenceNode) {
+          let nestedNode : BarebonesNode = {
+            id: referenceNode.source.number,
+            group: equalsIgnoringCase(referenceNode.source.state, "OPEN") ? 1 : 0
+          };
+
+          nodeStates.push(nestedNode);
+        });
+      });
+    });
+  }
+
+  let filteredNodeStates = nodeStates.filter((value, index, array)=>array.findIndex(t=>(t.id === value.id))===index)
+  return filteredNodeStates;
+}
+
 function computeLinks (nodeContainer: Array<Edge[]> | null)
 {
   let relationships:any = [];
@@ -210,5 +257,9 @@ function computeLinks (nodeContainer: Array<Edge[]> | null)
   {
     return { "error": "Could not compute links." }
   }
+}
+
+function equalsIgnoringCase(text, other) {
+    return text.localeCompare(other, undefined, { sensitivity: 'base' }) === 0;
 }
 </script>

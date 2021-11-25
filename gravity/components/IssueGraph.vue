@@ -13,6 +13,7 @@ export default {
     issueData: String
   },
   mounted() {
+    console.log(this.issueData);
     this.getData(this.issueData);
   },
   methods: {

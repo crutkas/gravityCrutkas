@@ -6,8 +6,6 @@
 
 <script>
 export default {
-  props: {
-    issueSummary
-  }
+  props: [ 'issueSummary' ]
 }
 </script>

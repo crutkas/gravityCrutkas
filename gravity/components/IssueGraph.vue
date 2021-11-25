@@ -18,10 +18,6 @@ export default {
   },
   methods: {
     getData(issueData) {
-      // console.log(issueData);
-      // var data = d3.json.parse(issueData);
-      // console.log(data);
-
       createNetwork(issueData);
     }
   },
@@ -36,15 +32,19 @@ function createNetwork(edgelist) {
         if (!nodeHash[edge.source]) {
             nodeHash[edge.source] = {
                 id: edge.source,
-                label: edgelist.nodes.find(x => x.id === edge.source).group
+                label: edge.source,
+                group: edgelist.nodes.find(x => x.id === edge.source).group
             };
+            console.log(nodeHash[edge.source]);
             nodes.push(nodeHash[edge.source]);
         }
         if (!nodeHash[edge.target]) {
             nodeHash[edge.target] = {
                 id: edge.target,
-                label: edgelist.nodes.find(x => x.id === edge.source).group
+                label: edge.target,
+                group: edgelist.nodes.find(x => x.id === edge.source).group
             };
+            console.log(nodeHash[edge.source]);
             nodes.push(nodeHash[edge.target]);
         }
         if (edge.weight >= 5) {
@@ -56,8 +56,6 @@ function createNetwork(edgelist) {
         }
     });
 
-    console.log("Nodes")
-    console.log(nodes)
     console.log("Edges")
     console.log(edges)
 

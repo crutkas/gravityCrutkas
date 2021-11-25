@@ -205,8 +205,8 @@ function computeNodeStates (nodeContainer: Array<Edge[]> | null)
     nodeContainer.forEach(function (nodeBlock) {
       nodeBlock.forEach(function(node) {
         let topLevelNode : BarebonesNode = {
-          id = node.node.number,
-          group = equalsIgnoringCase(node.node.state , "OPEN") ? 1 : 0
+          id: node.node.number,
+          group: equalsIgnoringCase(node.node.state , "OPEN") ? 1 : 0
         };
 
         nodeStates.push (topLevelNode);

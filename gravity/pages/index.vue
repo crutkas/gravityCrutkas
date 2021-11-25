@@ -153,7 +153,11 @@ function computeSummary(nodeContainer: Array<Edge[]> | null){
   if (nodeContainer) {
     nodeContainer.forEach(function (nodeBlock) {
       nodeBlock.forEach(function(node) {
-        let summary : IssueSummary = new IssueSummary();
+        let summary : IssueSummary = {
+          url: '',
+          title: '',
+          referencedIn: 0
+        };
         summary.url = node.node.url;
         summary.title = node.node.title;
         summary.referencedIn = node.node.timelineItems.totalCount;

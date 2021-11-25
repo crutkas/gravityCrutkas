@@ -75,19 +75,19 @@ function createForceNetwork(nodes, edges) {
         .on("tick", updateNetwork);
 
     d3.select("svg")
-        .data(edges)
-        .enter()
     // Responsive SVG needs these 2 attributes and no width and height attr.
        .attr("preserveAspectRatio", "xMinYMin meet")
-       .attr("viewBox", "0 0 900 900")
+       .attr("viewBox", "0 0 1900 1900")
        // Class to make it responsive.
        .classed("svg-content-responsive", true)
        // Fill with a rectangle for visualization.
        .append("rect")
        .classed("rect", true)
-       .attr("width", 900)
-       .attr("height", 900)
+       .attr("width", 1900)
+       .attr("height", 1900)
         .selectAll("line")
+        .data(edges)
+        .enter()
         .append("line")
         .style("fill", "#000")
         .style("stroke-width", "1px")
@@ -231,5 +231,11 @@ function createForceNetwork(nodes, edges) {
     position: absolute;
     top: 10px;
     left: 0;
+  }
+
+  svg .rect {
+    fill: gold;
+    stroke: steelblue;
+    stroke-width: 5px;
   }
 </style>

@@ -18,11 +18,11 @@ export default {
   },
   methods: {
     getData(issueData) {
-      console.log(issueData);
-      var data = d3.json.parse(issueData);
-      console.log(data);
+      // console.log(issueData);
+      // var data = d3.json.parse(issueData);
+      // console.log(data);
 
-      createNetwork(data);
+      createNetwork(issueData);
     }
   },
 }

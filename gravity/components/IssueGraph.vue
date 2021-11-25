@@ -65,10 +65,8 @@ function createNetwork(edgelist) {
     createForceNetwork(nodes, edges);
 }
 
+// Layout inspired from: https://bl.ocks.org/emeeks/df6ea0128724289337ef
 function createForceNetwork(nodes, edges) {
-
-    //create a network from an edgelist
-
     var force = d3.layout.force().nodes(nodes).links(edges)
         .size([500, 500])
         .charge(function(d) {
@@ -77,12 +75,9 @@ function createForceNetwork(nodes, edges) {
         .on("tick", updateNetwork);
 
     d3.select("svg")
-    // Responsive SVG needs these 2 attributes and no width and height attr.
        .attr("preserveAspectRatio", "xMinYMin meet")
        .attr("viewBox", "0 0 1900 1900")
-       // Class to make it responsive.
        .classed("svg-content-responsive", true)
-       // Fill with a rectangle for visualization.
        .append("rect")
        .classed("rect", true)
        .attr("width", 1900)

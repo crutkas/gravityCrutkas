@@ -54,6 +54,8 @@ function createNetwork(edgelist) {
         }
     });
 
+    console.log("Nodes")
+    console.log(nodes)
     console.log("Edges")
     console.log(edges)
 

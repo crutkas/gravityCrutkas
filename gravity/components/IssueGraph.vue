@@ -75,7 +75,7 @@ function createForceNetwork(nodes, edges) {
       .scaleExtent([1, 10])
       .on("zoom", zoomed);
 
-    d3.select("svg")
+    let svg = d3.select("svg")
        .attr("preserveAspectRatio", "xMinYMin meet")
        .attr("viewBox", "0 0 1900 1900")
        .classed("svg-content-responsive", true)
@@ -86,8 +86,7 @@ function createForceNetwork(nodes, edges) {
        .call(zoom)
        .append('svg:g');
 
-    d3.select("svg")
-      .selectAll("line")
+    svg.selectAll("line")
         .data(edges)
         .enter()
         .append("line")
@@ -95,7 +94,7 @@ function createForceNetwork(nodes, edges) {
         .style("stroke-width", "1px")
         .style("stroke", "#996666");
 
-    var nodeEnter = d3.select("svg").selectAll("g.node")
+    var nodeEnter = svg.selectAll("g.node")
         .data(nodes)
         .enter()
         .append("g")

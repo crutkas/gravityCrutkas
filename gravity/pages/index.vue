@@ -1,5 +1,6 @@
 <template>
-  <IssueGraph :issueData="issueData" :issueSummary="issueSummary"/>
+  <IssueGraph :issueData="issueData"/>
+  <IssueSummary :issueSummary="issueSummary"/>
 </template>
 
 <script lang="ts">
@@ -95,7 +96,7 @@ export default {
 
         return {
           issueData: relationships,
-          issueSummary: JSON.stringify(summaries)
+          issueSummary: summaries
         };
       } else {
         return {

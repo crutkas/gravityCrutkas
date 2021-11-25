@@ -138,7 +138,13 @@ function createForceNetwork(nodes, edges) {
     function nodeOut() {
         force.start();
         d3.selectAll("g.node > circle")
-            .style("fill", "#CC9999");
+            .style("fill", function(d) {
+            if (d.group == 1) {
+                return "#238636"
+            } else {
+                return "#8957e5"
+            }
+        })
 
         d3.selectAll("line")
             .style("stroke", "#996666")

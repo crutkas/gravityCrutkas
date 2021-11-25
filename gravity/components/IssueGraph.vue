@@ -114,7 +114,7 @@ function createForceNetwork(nodes, edges) {
         .attr("y", 2)
         .style("stroke-width", "1px")
         .style("stroke-opacity", 0.75)
-        .style("stroke", "white")
+        .style("stroke", "#000")
         .style("font-size", "8px")
         .text(function(d) {
             return d.id
@@ -220,6 +220,7 @@ function createForceNetwork(nodes, edges) {
     padding-bottom: 100%; /* aspect ratio */
     vertical-align: top;
     overflow: hidden;
+    fill: #fff;
   }
 
   .svg-content-responsive {

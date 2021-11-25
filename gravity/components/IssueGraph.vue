@@ -89,7 +89,7 @@ function createForceNetwork(nodes, edges) {
         .data(edges)
         .enter()
         .append("line")
-        .style("fill", "#fff")
+        .style("fill", "#000")
         .style("stroke-width", "1px")
         .style("stroke", "#996666");
 
@@ -153,7 +153,7 @@ function createForceNetwork(nodes, edges) {
 
         d3.selectAll("line")
             .style("stroke", "#996666")
-            .style("fill", "#fff")
+            .style("fill", "#000")
             .style("stroke-width", "1px");
     }
 
@@ -176,7 +176,7 @@ function createForceNetwork(nodes, edges) {
                 return filteredEdges.indexOf(p) > -1
             })
             .style("stroke", "#66CCCC")
-            .style("fill", "#fff")
+            .style("fill", "#000")
             .style("stroke-width", "2px");
 
         d3.selectAll("circle").filter(function(p) {

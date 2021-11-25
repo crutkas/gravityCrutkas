@@ -41,7 +41,7 @@ function createNetwork(edgelist) {
             nodeHash[edge.target] = {
                 id: edge.target,
                 label: edge.target,
-                group: edgelist.nodes.find(x => x.id === edge.source).group
+                group: edgelist.nodes.find(x => x.id === edge.target).group
             };
             nodes.push(nodeHash[edge.target]);
         }

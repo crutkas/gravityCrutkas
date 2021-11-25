@@ -32,7 +32,7 @@ function createNetwork(edgelist) {
     var nodes = [];
     var edges = [];
 
-    edgelist.forEach(function(edge) {
+    edgelist.links.forEach(function(edge) {
         if (!nodeHash[edge.source]) {
             nodeHash[edge.source] = {
                 id: edge.source,

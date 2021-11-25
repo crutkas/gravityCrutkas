@@ -264,7 +264,7 @@ function computeLinks (nodeContainer: Array<Edge[]> | null)
   }
 }
 
-function equalsIgnoringCase(text, other) {
+function equalsIgnoringCase(text : string, other : string) {
     return text.localeCompare(other, undefined, { sensitivity: 'base' }) === 0;
 }
 </script>

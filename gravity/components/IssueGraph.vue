@@ -82,7 +82,7 @@ function createForceNetwork(nodes, edges) {
        .append("rect")
        .classed("rect", true)
        .attr("width", 1900)
-       .attr("height", 1900);
+       .attr("height", 1900)
        .call(zoom)
        .append('svg:g');
 

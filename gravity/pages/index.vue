@@ -1,5 +1,5 @@
 <template>
-  <IssueGraph :issueData="issueData"/>
+  <IssueGraph :issueData="issueData" :issueSummary="issueSummary"/>
 </template>
 
 <script lang="ts">
@@ -30,6 +30,8 @@ export interface Edge {
 
 export interface EdgeNode {
     number:        number;
+    title:         string;
+    url:           string;
     timelineItems: TimelineItems;
 }
 
@@ -51,6 +53,12 @@ export interface PageInfo {
     startCursor: null | string;
     hasNextPage: boolean;
     endCursor:   null | string;
+}
+
+export interface IssueSummary {
+  title: string;
+  url: string;
+  referencedIn: number;
 }
 
 export default {
@@ -83,13 +91,16 @@ export default {
         }
 
         let relationships = computeLinks(sanitizedIssues);
+        let summaries = computeSummary(sanitizedIssues);
 
         return {
           issueData: relationships,
+          issueSummary: JSON.stringify(summaries)
         };
       } else {
         return {
-          issueData: { error: "No GitHub token available." },
+          issueData: { error: "No issue data available." },
+          issueSummary: { error: "No summary available." },
         };
       }
     } catch (e) {
@@ -117,12 +128,12 @@ async function getIssues(token: string | null, after: string | null) {
 
   if (after) {
     body = {
-      query: `query {repository(owner:"microsoft",name:"powertoys"){issues(first:100, states:OPEN, after:"${after}"){totalCount pageInfo{startCursor hasNextPage endCursor}edges{node{number timelineItems(first:200,itemTypes:CROSS_REFERENCED_EVENT){totalCount pageInfo{startCursor hasNextPage endCursor}nodes{...on CrossReferencedEvent{source{...on Issue{number}}}}}}}}}}`,
+      query: `query {repository(owner:"microsoft",name:"powertoys"){issues(first:100, states:OPEN, after:"${after}"){totalCount pageInfo{startCursor hasNextPage endCursor}edges{node{number title url timelineItems(first:200,itemTypes:CROSS_REFERENCED_EVENT){totalCount pageInfo{startCursor hasNextPage endCursor}nodes{...on CrossReferencedEvent{source{...on Issue{number}}}}}}}}}}`,
     };
   } else {
     body = {
       query:
-        'query {repository(owner:"microsoft",name:"powertoys"){issues(first:100, states:OPEN){totalCount pageInfo{startCursor hasNextPage endCursor}edges{node{number timelineItems(first:200,itemTypes:CROSS_REFERENCED_EVENT){totalCount pageInfo{startCursor hasNextPage endCursor}nodes{...on CrossReferencedEvent{source{...on Issue{number}}}}}}}}}}',
+        'query {repository(owner:"microsoft",name:"powertoys"){issues(first:100, states:OPEN){totalCount pageInfo{startCursor hasNextPage endCursor}edges{node{number title url timelineItems(first:200,itemTypes:CROSS_REFERENCED_EVENT){totalCount pageInfo{startCursor hasNextPage endCursor}nodes{...on CrossReferencedEvent{source{...on Issue{number}}}}}}}}}}',
     };
   }
 
@@ -136,6 +147,25 @@ async function getIssues(token: string | null, after: string | null) {
   return data;
 }
 
+function computeSummary(nodeContainer: Array<Edge[]> | null){
+  let summaryItems : Array<IssueSummary> = []
+
+  if (nodeContainer) {
+    nodeContainer.forEach(function (nodeBlock) {
+      nodeBlock.forEach(function(node) {
+        let summary : IssueSummary = {};
+        summary.url = node.node.url;
+        summary.title = node.node.title;
+        summary.referencedIn = node.node.timelineItems.totalCount;
+
+        summaryItems.push(summary);
+      });
+    });
+  }
+
+  return summaryItems;
+}
+
 function computeLinks (nodeContainer: Array<Edge[]> | null)
 {
   let relationships:any = [["source", "target", "weight"]];
@@ -143,7 +173,6 @@ function computeLinks (nodeContainer: Array<Edge[]> | null)
   if (nodeContainer)
   {
     nodeContainer.forEach(function (nodeBlock) {
-      // Here we now have an array of node objects
       nodeBlock.forEach(function(node) {
         let number = node.node.number;
         node.node.timelineItems.nodes.forEach(function (referenceNode) {

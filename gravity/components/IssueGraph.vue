@@ -2,6 +2,7 @@
 <template>
   <div class="svg-container">
     <svg id="issueGraph"></svg>
+    <p>{{ issueSummary }}</p>
   </div>
 </template>
 
@@ -11,6 +12,7 @@ const d3 = require("d3");
 export default {
   props: {
     issueData: String,
+    issueSummary: String,
   },
   mounted() {
     this.getData(this.issueData);

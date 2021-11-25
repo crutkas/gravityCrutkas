@@ -212,12 +212,14 @@ function computeNodeStates (nodeContainer: Array<Edge[]> | null)
         nodeStates.push (topLevelNode);
 
         node.node.timelineItems.nodes.forEach(function (referenceNode) {
-          let nestedNode : BarebonesNode = {
-            id: referenceNode.source.number.toString(),
-            group: equalsIgnoringCase(referenceNode.source.state, "OPEN") ? 1 : 0
-          };
+          if (referenceNode.source.number) {
+            let nestedNode : BarebonesNode = {
+              id: referenceNode.source.number.toString(),
+              group: equalsIgnoringCase(referenceNode.source.state, "OPEN") ? 1 : 0
+            };
 
-          nodeStates.push(nestedNode);
+            nodeStates.push(nestedNode);
+          }
         });
       });
     });

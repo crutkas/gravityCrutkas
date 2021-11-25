@@ -35,7 +35,6 @@ function createNetwork(edgelist) {
                 label: edge.source,
                 group: edgelist.nodes.find(x => x.id === edge.source).group
             };
-            console.log(nodeHash[edge.source]);
             nodes.push(nodeHash[edge.source]);
         }
         if (!nodeHash[edge.target]) {
@@ -44,7 +43,6 @@ function createNetwork(edgelist) {
                 label: edge.target,
                 group: edgelist.nodes.find(x => x.id === edge.source).group
             };
-            console.log(nodeHash[edge.source]);
             nodes.push(nodeHash[edge.target]);
         }
         if (edge.weight >= 5) {
@@ -102,7 +100,13 @@ function createForceNetwork(nodes, edges) {
 
     nodeEnter.append("circle")
         .attr("r", 5)
-        .style("fill", "#CC9999")
+        .style("fill", function(d) {
+            if (d.group == 1) {
+                return "#238636"
+            } else {
+                return "#8957e5"
+            }
+        })
         .style("stroke", "black")
         .style("stroke-width", "1px")
 

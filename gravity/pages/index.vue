@@ -116,8 +116,8 @@ export default {
         let summaries = computeSummary(sanitizedIssues);
 
         let d3data : D3DataContainer = {
-          nodes = nodeStates,
-          links = relationships
+          nodes: nodeStates,
+          links: relationships
         }
 
         return {

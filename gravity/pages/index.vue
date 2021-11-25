@@ -51,6 +51,7 @@ export interface NodeElement {
 
 export interface Source {
     number?: number;
+    state: string;
 }
 
 export interface PageInfo {

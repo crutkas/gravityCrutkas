@@ -120,6 +120,7 @@ function createForceNetwork(nodes, edges) {
         .style("pointer-events", "none")
 
     force.start();
+    d3.zoom();
 
     function nodeClick(d) {
         d.fixed = true;

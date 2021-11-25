@@ -65,6 +65,12 @@ export interface IssueSummary {
   referencedIn: number;
 }
 
+export interface Relationship {
+  source: string;
+  target: string;
+  weight: number;
+}
+
 export default {
   async asyncData(context: Context) {
     try {
@@ -176,7 +182,7 @@ function computeSummary(nodeContainer: Array<Edge[]> | null){
 
 function computeLinks (nodeContainer: Array<Edge[]> | null)
 {
-  let relationships:any = [["source", "target", "weight"]];
+  let relationships:any = [];
 
   if (nodeContainer)
   {
@@ -184,16 +190,21 @@ function computeLinks (nodeContainer: Array<Edge[]> | null)
       nodeBlock.forEach(function(node) {
         let number = node.node.number;
         node.node.timelineItems.nodes.forEach(function (referenceNode) {
-          relationships.push([number, referenceNode.source.number, 6]);
+          let relationship : Relationship = {
+            source: number,
+            target: referenceNode.source.number,
+            weight: 6
+          };
+          relationships.push(relationship);
         });
       });
     });
 
-    let filteredRelationships = relationships.filter(function (entity:any) {
-      return (entity[0] != null && entity[1] != null)
+    let filteredRelationships = relationships.filter(function (entity:Relationship) {
+      return (entity.source != null && entity.target != null)
     });
 
-    return filteredRelationships.map((e:any) => e.join(",")).join("\n"); 
+    return filteredRelationships; 
   }
   else
   {

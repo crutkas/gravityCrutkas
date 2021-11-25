@@ -240,12 +240,14 @@ function computeLinks (nodeContainer: Array<Edge[]> | null)
       nodeBlock.forEach(function(node) {
         let number = node.node.number;
         node.node.timelineItems.nodes.forEach(function (referenceNode) {
-          let relationship : Relationship = {
-            source: number.toString(),
-            target: referenceNode.source.number.toString(),
-            weight: 6
-          };
-          relationships.push(relationship);
+          if (referenceNode.source.number) {
+            let relationship : Relationship = {
+              source: number.toString(),
+              target: referenceNode.source.number.toString(),
+              weight: 6
+            };
+            relationships.push(relationship);
+          }
         });
       });
     });

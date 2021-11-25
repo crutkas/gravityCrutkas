@@ -205,7 +205,7 @@ function computeNodeStates (nodeContainer: Array<Edge[]> | null)
     nodeContainer.forEach(function (nodeBlock) {
       nodeBlock.forEach(function(node) {
         let topLevelNode : BarebonesNode = {
-          id: node.node.number,
+          id: node.node.number.toString(),
           group: equalsIgnoringCase(node.node.state , "OPEN") ? 1 : 0
         };
 
@@ -213,7 +213,7 @@ function computeNodeStates (nodeContainer: Array<Edge[]> | null)
 
         node.node.timelineItems.nodes.forEach(function (referenceNode) {
           let nestedNode : BarebonesNode = {
-            id: referenceNode.source.number,
+            id: referenceNode.source.number.toString(),
             group: equalsIgnoringCase(referenceNode.source.state, "OPEN") ? 1 : 0
           };
 
@@ -238,8 +238,8 @@ function computeLinks (nodeContainer: Array<Edge[]> | null)
         let number = node.node.number;
         node.node.timelineItems.nodes.forEach(function (referenceNode) {
           let relationship : Relationship = {
-            source: number,
-            target: referenceNode.source.number,
+            source: number.toString(),
+            target: referenceNode.source.number.toString(),
             weight: 6
           };
           relationships.push(relationship);

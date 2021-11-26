@@ -81,7 +81,7 @@ function createForceNetwork(nodes, edges) {
             console.log(d3.event.transform);
             svg.attr("transform", d3.event.transform);
         }))
-       .appeng("g")
+       .append("g")
 
     svg.selectAll("line")
         .data(edges)

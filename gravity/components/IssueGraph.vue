@@ -71,20 +71,19 @@ function createForceNetwork(nodes, edges) {
         })
         .on("tick", updateNetwork);
 
-    let zoom = d3.behavior.zoom()
-      .scaleExtent([1, 10])
-      .on("zoom", zoomed);
-
-    d3.select("svg")
+    var svg = d3.select("svg")
        .attr("preserveAspectRatio", "xMinYMin meet")
        .attr("viewBox", "0 0 1900 1900")
        .classed("svg-content-responsive", true)
-       .call(zoom)
        .attr("width", 1900)
-       .attr("height", 1900);
+       .attr("height", 1900)
+       .call(d3.zoom().on("zoom", function () {
+            console.log(d3.event.transform);
+            svg.attr("transform", d3.event.transform);
+        }))
+       .appeng("g")
 
-    d3.select("svg")
-        .selectAll("line")
+    svg.selectAll("line")
         .data(edges)
         .enter()
         .append("line")
@@ -92,7 +91,7 @@ function createForceNetwork(nodes, edges) {
         .style("stroke-width", "1px")
         .style("stroke", "#996666");
 
-    var nodeEnter = d3.select("svg").selectAll("g.node")
+    var nodeEnter = svg.selectAll("g.node")
         .data(nodes)
         .enter()
         .append("g")
@@ -125,10 +124,6 @@ function createForceNetwork(nodes, edges) {
         .style("pointer-events", "none")
 
     force.start();
-
-    function zoomed() {
-      d3.select("svg").attr("transform", d3.event.transform);
-    }
 
     function nodeClick(d) {
         d.fixed = true;

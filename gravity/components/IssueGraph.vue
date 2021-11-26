@@ -75,7 +75,7 @@ function createForceNetwork(nodes, edges) {
       .scaleExtent([1, 10])
       .on("zoom", zoomed);
 
-    let svg = d3.select("svg")
+    d3.select("svg")
        .attr("preserveAspectRatio", "xMinYMin meet")
        .attr("viewBox", "0 0 1900 1900")
        .classed("svg-content-responsive", true)
@@ -130,7 +130,8 @@ function createForceNetwork(nodes, edges) {
     force.start();
 
     function zoomed() {
-      svg.attr("transform", "translate(" + d3.event.translate + ")scale(" + d3.event.scale + ")");
+      console.log("Zooming!");
+      d3.select("svg").attr("transform", "translate(" + d3.event.translate + ")scale(" + d3.event.scale + ")");
     }
 
     function nodeClick(d) {

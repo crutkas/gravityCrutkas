@@ -75,7 +75,7 @@ function createForceNetwork(nodes, edges) {
       .scaleExtent([1, 10])
       .on("zoom", zoomed);
 
-    d3.select("svg")
+    let svg = d3.select("svg")
        .attr("preserveAspectRatio", "xMinYMin meet")
        .attr("viewBox", "0 0 1900 1900")
        .classed("svg-content-responsive", true)

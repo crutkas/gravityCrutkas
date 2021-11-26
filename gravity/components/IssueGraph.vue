@@ -80,14 +80,13 @@ function createForceNetwork(nodes, edges) {
        .attr("viewBox", "0 0 1900 1900")
        .classed("svg-content-responsive", true)
        .call(zoom)
-       .append('svg:g')
        .append("rect")
        .classed("rect", true)
        .attr("width", 1900)
        .attr("height", 1900);
 
     d3.select("svg")
-      .selectAll("line")
+        .selectAll("line")
         .data(edges)
         .enter()
         .append("line")

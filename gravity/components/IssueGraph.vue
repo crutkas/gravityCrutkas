@@ -131,7 +131,9 @@ function createForceNetwork(nodes, edges) {
 
     function zoomed() {
       console.log("Zooming!");
+      force.stop();
       d3.select("svg").attr("transform", "translate(" + d3.event.translate + ")scale(" + d3.event.scale + ")");
+      force.start();
     }
 
     function nodeClick(d) {

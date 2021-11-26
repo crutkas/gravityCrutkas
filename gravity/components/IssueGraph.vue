@@ -77,7 +77,7 @@ function createForceNetwork(nodes, edges) {
        .classed("svg-content-responsive", true)
        .attr("width", 1900)
        .attr("height", 1900)
-       .call(d3.zoom().on("zoom", function () {
+       .call(d3.behavior.zoom().on("zoom", function () {
             console.log(d3.event.transform);
             svg.attr("transform", d3.event.transform);
         }))

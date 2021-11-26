@@ -79,7 +79,7 @@ function createForceNetwork(nodes, edges) {
        .attr("height", 1900)
        .call(d3.behavior.zoom().on("zoom", function () {
             console.log(d3.event.transform);
-            svg.attr("transform", d3.event.transform);
+            svg.attr("transform", "translate(" + d3.event.translate + ")" + " scale(" + d3.event.scale + ")");
         }))
        .append("g")
 

@@ -10,54 +10,54 @@ import { getSecrets, NetlifySecrets } from "@netlify/functions";
 import { Context } from "@nuxt/types";
 
 export interface Container {
-    data: Data;
+  data: Data;
 }
 
 export interface Data {
-    repository: Repository;
+  repository: Repository;
 }
 
 export interface Repository {
-    issues: Issues;
+  issues: Issues;
 }
 
 export interface Issues {
-    totalCount: number;
-    pageInfo:   PageInfo;
-    edges:      Edge[];
+  totalCount: number;
+  pageInfo: PageInfo;
+  edges: Edge[];
 }
 
 export interface Edge {
-    node: EdgeNode;
+  node: EdgeNode;
 }
 
 export interface EdgeNode {
-    number:        number;
-    title:         string;
-    url:           string;
-    state:         string;
-    timelineItems: TimelineItems;
+  number: number;
+  title: string;
+  url: string;
+  state: string;
+  timelineItems: TimelineItems;
 }
 
 export interface TimelineItems {
-    totalCount: number;
-    pageInfo:   PageInfo;
-    nodes:      NodeElement[];
+  totalCount: number;
+  pageInfo: PageInfo;
+  nodes: NodeElement[];
 }
 
 export interface NodeElement {
-    source: Source;
+  source: Source;
 }
 
 export interface Source {
-    number?: number;
-    state: string;
+  number?: number;
+  state: string;
 }
 
 export interface PageInfo {
-    startCursor: null | string;
-    hasNextPage: boolean;
-    endCursor:   null | string;
+  startCursor: null | string;
+  hasNextPage: boolean;
+  endCursor: null | string;
 }
 
 export interface IssueSummary {
@@ -82,7 +82,6 @@ export interface D3DataContainer {
   links: Array<Relationship>;
 }
 
-
 export default {
   async asyncData(context: Context) {
     try {
@@ -93,7 +92,10 @@ export default {
         let sanitizedIssues = [];
 
         // Initial call - let's get the first batch.
-        let issues: Container = await getIssues(secrets.gitHub?.bearerToken, null);
+        let issues: Container = await getIssues(
+          secrets.gitHub?.bearerToken,
+          null
+        );
         console.log(issues);
 
         // See if we have a stack of referenced issues
@@ -116,14 +118,14 @@ export default {
         let nodeStates = computeNodeStates(sanitizedIssues);
         let summaries = computeSummary(sanitizedIssues);
 
-        let d3data : D3DataContainer = {
+        let d3data: D3DataContainer = {
           nodes: nodeStates,
-          links: relationships
-        }
+          links: relationships,
+        };
 
         return {
           issueData: d3data,
-          issueSummary: summaries
+          issueSummary: summaries,
         };
       } else {
         return {
@@ -175,16 +177,16 @@ async function getIssues(token: string | null, after: string | null) {
   return data;
 }
 
-function computeSummary(nodeContainer: Array<Edge[]> | null){
-  let summaryItems : Array<IssueSummary> = []
+function computeSummary(nodeContainer: Array<Edge[]> | null) {
+  let summaryItems: Array<IssueSummary> = [];
 
   if (nodeContainer) {
     nodeContainer.forEach(function (nodeBlock) {
-      nodeBlock.forEach(function(node) {
-        let summary : IssueSummary = {
-          url: '',
-          title: '',
-          referencedIn: 0
+      nodeBlock.forEach(function (node) {
+        let summary: IssueSummary = {
+          url: "",
+          title: "",
+          referencedIn: 0,
         };
         summary.url = node.node.url;
         summary.title = node.node.title;
@@ -198,25 +200,26 @@ function computeSummary(nodeContainer: Array<Edge[]> | null){
   return summaryItems;
 }
 
-function computeNodeStates (nodeContainer: Array<Edge[]> | null)
-{
-  let nodeStates : Array<BarebonesNode> = []
+function computeNodeStates(nodeContainer: Array<Edge[]> | null) {
+  let nodeStates: Array<BarebonesNode> = [];
 
   if (nodeContainer) {
     nodeContainer.forEach(function (nodeBlock) {
-      nodeBlock.forEach(function(node) {
-        let topLevelNode : BarebonesNode = {
+      nodeBlock.forEach(function (node) {
+        let topLevelNode: BarebonesNode = {
           id: node.node.number.toString(),
-          group: equalsIgnoringCase(node.node.state , "OPEN") ? 1 : 0
+          group: equalsIgnoringCase(node.node.state, "OPEN") ? 1 : 0,
         };
 
-        nodeStates.push (topLevelNode);
+        nodeStates.push(topLevelNode);
 
         node.node.timelineItems.nodes.forEach(function (referenceNode) {
           if (referenceNode.source.number) {
-            let nestedNode : BarebonesNode = {
+            let nestedNode: BarebonesNode = {
               id: referenceNode.source.number.toString(),
-              group: equalsIgnoringCase(referenceNode.source.state, "OPEN") ? 1 : 0
+              group: equalsIgnoringCase(referenceNode.source.state, "OPEN")
+                ? 1
+                : 0,
             };
 
             nodeStates.push(nestedNode);
@@ -226,25 +229,25 @@ function computeNodeStates (nodeContainer: Array<Edge[]> | null)
     });
   }
 
-  let filteredNodeStates = nodeStates.filter((value, index, array)=>array.findIndex(t=>(t.id === value.id))===index)
+  let filteredNodeStates = nodeStates.filter(
+    (value, index, array) => array.findIndex((t) => t.id === value.id) === index
+  );
   return filteredNodeStates;
 }
 
-function computeLinks (nodeContainer: Array<Edge[]> | null)
-{
-  let relationships:any = [];
+function computeLinks(nodeContainer: Array<Edge[]> | null) {
+  let relationships: any = [];
 
-  if (nodeContainer)
-  {
+  if (nodeContainer) {
     nodeContainer.forEach(function (nodeBlock) {
-      nodeBlock.forEach(function(node) {
+      nodeBlock.forEach(function (node) {
         let number = node.node.number;
         node.node.timelineItems.nodes.forEach(function (referenceNode) {
           if (referenceNode.source.number) {
-            let relationship : Relationship = {
+            let relationship: Relationship = {
               source: number.toString(),
               target: referenceNode.source.number.toString(),
-              weight: 6
+              weight: 6,
             };
             relationships.push(relationship);
           }
@@ -252,19 +255,19 @@ function computeLinks (nodeContainer: Array<Edge[]> | null)
       });
     });
 
-    let filteredRelationships = relationships.filter(function (entity:Relationship) {
-      return (entity.source != null && entity.target != null)
+    let filteredRelationships = relationships.filter(function (
+      entity: Relationship
+    ) {
+      return entity.source != null && entity.target != null;
     });
 
-    return filteredRelationships; 
-  }
-  else
-  {
-    return { "error": "Could not compute links." }
+    return filteredRelationships;
+  } else {
+    return { error: "Could not compute links." };
   }
 }
 
-function equalsIgnoringCase(text : string, other : string) {
-    return text.localeCompare(other, undefined, { sensitivity: 'base' }) === 0;
+function equalsIgnoringCase(text: string, other: string) {
+  return text.localeCompare(other, undefined, { sensitivity: "base" }) === 0;
 }
 </script>

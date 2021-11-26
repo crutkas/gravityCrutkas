@@ -79,12 +79,12 @@ function createForceNetwork(nodes, edges) {
        .attr("preserveAspectRatio", "xMinYMin meet")
        .attr("viewBox", "0 0 1900 1900")
        .classed("svg-content-responsive", true)
+       .call(zoom)
+       .append('svg:g');
        .append("rect")
        .classed("rect", true)
        .attr("width", 1900)
        .attr("height", 1900)
-       .call(zoom)
-       .append('svg:g');
 
     svg.selectAll("line")
         .data(edges)

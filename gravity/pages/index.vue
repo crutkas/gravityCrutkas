@@ -10,58 +10,76 @@ import { getSecrets, NetlifySecrets } from "@netlify/functions";
 import { Context } from "@nuxt/types";
 
 export interface Container {
-    data: Data;
+  data: Data;
 }
 
 export interface Data {
-    repository: Repository;
+  repository: Repository;
 }
 
 export interface Repository {
-    issues: Issues;
+  issues: Issues;
 }
 
 export interface Issues {
-    totalCount: number;
-    pageInfo:   PageInfo;
-    edges:      Edge[];
+  totalCount: number;
+  pageInfo: PageInfo;
+  edges: Edge[];
 }
 
 export interface Edge {
-    node: EdgeNode;
+  node: EdgeNode;
 }
 
 export interface EdgeNode {
-    number:        number;
-    title:         string;
-    url:           string;
-    timelineItems: TimelineItems;
+  number: number;
+  title: string;
+  url: string;
+  state: string;
+  timelineItems: TimelineItems;
 }
 
 export interface TimelineItems {
-    totalCount: number;
-    pageInfo:   PageInfo;
-    nodes:      NodeElement[];
+  totalCount: number;
+  pageInfo: PageInfo;
+  nodes: NodeElement[];
 }
 
 export interface NodeElement {
-    source: Source;
+  source: Source;
 }
 
 export interface Source {
-    number?: number;
+  number?: number;
+  state: string;
 }
 
 export interface PageInfo {
-    startCursor: null | string;
-    hasNextPage: boolean;
-    endCursor:   null | string;
+  startCursor: null | string;
+  hasNextPage: boolean;
+  endCursor: null | string;
 }
 
 export interface IssueSummary {
   title: string;
   url: string;
   referencedIn: number;
+}
+
+export interface Relationship {
+  source: string;
+  target: string;
+  weight: number;
+}
+
+export interface BarebonesNode {
+  id: string;
+  group: number;
+}
+
+export interface D3DataContainer {
+  nodes: Array<BarebonesNode>;
+  links: Array<Relationship>;
 }
 
 export default {
@@ -74,7 +92,10 @@ export default {
         let sanitizedIssues = [];
 
         // Initial call - let's get the first batch.
-        let issues: Container = await getIssues(secrets.gitHub?.bearerToken, null);
+        let issues: Container = await getIssues(
+          secrets.gitHub?.bearerToken,
+          null
+        );
         console.log(issues);
 
         // See if we have a stack of referenced issues
@@ -94,11 +115,17 @@ export default {
         }
 
         let relationships = computeLinks(sanitizedIssues);
+        let nodeStates = computeNodeStates(sanitizedIssues);
         let summaries = computeSummary(sanitizedIssues);
 
+        let d3data: D3DataContainer = {
+          nodes: nodeStates,
+          links: relationships,
+        };
+
         return {
-          issueData: relationships,
-          issueSummary: summaries
+          issueData: d3data,
+          issueSummary: summaries,
         };
       } else {
         return {
@@ -131,12 +158,12 @@ async function getIssues(token: string | null, after: string | null) {
 
   if (after) {
     body = {
-      query: `query {repository(owner:"microsoft",name:"powertoys"){issues(first:100, states:OPEN, after:"${after}"){totalCount pageInfo{startCursor hasNextPage endCursor}edges{node{number title url timelineItems(first:200,itemTypes:CROSS_REFERENCED_EVENT){totalCount pageInfo{startCursor hasNextPage endCursor}nodes{...on CrossReferencedEvent{source{...on Issue{number}}}}}}}}}}`,
+      query: `query {repository(owner:"microsoft",name:"powertoys"){issues(first:100, states:OPEN, after:"${after}"){totalCount pageInfo{startCursor hasNextPage endCursor}edges{node{number title url state timelineItems(first:200,itemTypes:CROSS_REFERENCED_EVENT){totalCount pageInfo{startCursor hasNextPage endCursor}nodes{...on CrossReferencedEvent{source{...on Issue{number state}}}}}}}}}}`,
     };
   } else {
     body = {
       query:
-        'query {repository(owner:"microsoft",name:"powertoys"){issues(first:100, states:OPEN){totalCount pageInfo{startCursor hasNextPage endCursor}edges{node{number title url timelineItems(first:200,itemTypes:CROSS_REFERENCED_EVENT){totalCount pageInfo{startCursor hasNextPage endCursor}nodes{...on CrossReferencedEvent{source{...on Issue{number}}}}}}}}}}',
+        'query {repository(owner:"microsoft",name:"powertoys"){issues(first:100, states:OPEN){totalCount pageInfo{startCursor hasNextPage endCursor}edges{node{number title url state timelineItems(first:200,itemTypes:CROSS_REFERENCED_EVENT){totalCount pageInfo{startCursor hasNextPage endCursor}nodes{...on CrossReferencedEvent{source{...on Issue{number state}}}}}}}}}}',
     };
   }
 
@@ -150,16 +177,16 @@ async function getIssues(token: string | null, after: string | null) {
   return data;
 }
 
-function computeSummary(nodeContainer: Array<Edge[]> | null){
-  let summaryItems : Array<IssueSummary> = []
+function computeSummary(nodeContainer: Array<Edge[]> | null) {
+  let summaryItems: Array<IssueSummary> = [];
 
   if (nodeContainer) {
     nodeContainer.forEach(function (nodeBlock) {
-      nodeBlock.forEach(function(node) {
-        let summary : IssueSummary = {
-          url: '',
-          title: '',
-          referencedIn: 0
+      nodeBlock.forEach(function (node) {
+        let summary: IssueSummary = {
+          url: "",
+          title: "",
+          referencedIn: 0,
         };
         summary.url = node.node.url;
         summary.title = node.node.title;
@@ -173,30 +200,74 @@ function computeSummary(nodeContainer: Array<Edge[]> | null){
   return summaryItems;
 }
 
-function computeLinks (nodeContainer: Array<Edge[]> | null)
-{
-  let relationships:any = [["source", "target", "weight"]];
+function computeNodeStates(nodeContainer: Array<Edge[]> | null) {
+  let nodeStates: Array<BarebonesNode> = [];
 
-  if (nodeContainer)
-  {
+  if (nodeContainer) {
     nodeContainer.forEach(function (nodeBlock) {
-      nodeBlock.forEach(function(node) {
+      nodeBlock.forEach(function (node) {
+        let topLevelNode: BarebonesNode = {
+          id: node.node.number.toString(),
+          group: equalsIgnoringCase(node.node.state, "OPEN") ? 1 : 0,
+        };
+
+        nodeStates.push(topLevelNode);
+
+        node.node.timelineItems.nodes.forEach(function (referenceNode) {
+          if (referenceNode.source.number) {
+            let nestedNode: BarebonesNode = {
+              id: referenceNode.source.number.toString(),
+              group: equalsIgnoringCase(referenceNode.source.state, "OPEN")
+                ? 1
+                : 0,
+            };
+
+            nodeStates.push(nestedNode);
+          }
+        });
+      });
+    });
+  }
+
+  let filteredNodeStates = nodeStates.filter(
+    (value, index, array) => array.findIndex((t) => t.id === value.id) === index
+  );
+  return filteredNodeStates;
+}
+
+function computeLinks(nodeContainer: Array<Edge[]> | null) {
+  let relationships: any = [];
+
+  if (nodeContainer) {
+    nodeContainer.forEach(function (nodeBlock) {
+      nodeBlock.forEach(function (node) {
         let number = node.node.number;
         node.node.timelineItems.nodes.forEach(function (referenceNode) {
-          relationships.push([number, referenceNode.source.number, 6]);
+          if (referenceNode.source.number) {
+            let relationship: Relationship = {
+              source: number.toString(),
+              target: referenceNode.source.number.toString(),
+              weight: 6,
+            };
+            relationships.push(relationship);
+          }
         });
       });
     });
 
-    let filteredRelationships = relationships.filter(function (entity:any) {
-      return (entity[0] != null && entity[1] != null)
+    let filteredRelationships = relationships.filter(function (
+      entity: Relationship
+    ) {
+      return entity.source != null && entity.target != null;
     });
 
-    return filteredRelationships.map((e:any) => e.join(",")).join("\n"); 
+    return filteredRelationships;
+  } else {
+    return { error: "Could not compute links." };
   }
-  else
-  {
-    return { "error": "Could not compute links." }
-  }
+}
+
+function equalsIgnoringCase(text: string, other: string) {
+  return text.localeCompare(other, undefined, { sensitivity: "base" }) === 0;
 }
 </script>

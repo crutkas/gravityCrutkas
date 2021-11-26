@@ -10,19 +10,20 @@
 
 <script>
 export default {
-  props: [ 'issueSummary' ],
+  props: ["issueSummary"],
   data() {
-      return {
-        fields: [
-          {
-            key: 'title',
-            sortable: true
-          },
-          {
-            key: 'referencedIn',
-            sortable: true
-          },
-        ]}
+    return {
+      fields: [
+        {
+          key: "title",
+          sortable: true,
+        },
+        {
+          key: "referencedIn",
+          sortable: true,
+        },
+      ],
+    };
   },
-}
+};
 </script>

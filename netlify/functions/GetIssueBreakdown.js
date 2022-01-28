@@ -2,7 +2,6 @@ import { getSecrets } from "@netlify/functions";
 import NetlifyGraph from "./netlifyGraph"
 
 export const handler = async (event, context) => {
-  // By default, all API calls use no authentication
   let accessToken = null;
 
   //// If you want to use the client's accessToken when making API calls on the user's behalf:

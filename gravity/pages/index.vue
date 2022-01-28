@@ -96,7 +96,6 @@ export default {
           secrets.gitHub?.bearerToken,
           null
         );
-        console.log(issues);
 
         // See if we have a stack of referenced issues
         if (issues.data.repository.issues.edges) {
@@ -105,7 +104,6 @@ export default {
 
           // If there is more than one page, let's get all the issues.
           while (issues.data.repository.issues.pageInfo.hasNextPage) {
-            console.log("Iterating!");
             issues = await getIssues(
               secrets.gitHub?.bearerToken,
               issues.data.repository.issues.pageInfo.endCursor

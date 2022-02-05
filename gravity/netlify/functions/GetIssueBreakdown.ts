@@ -2,7 +2,7 @@ const { getSecrets, NetlifySecrets } = require("@netlify/functions");
 const NetlifyGraph = require("./netlifyGraph")
 
 exports.handler = async (event, context) => {
-  let secrets: NetlifySecrets = {};
+  let secrets: typeof NetlifySecrets = {};
   secrets = await getSecrets(); 
   
   // By default, all API calls use no authentication

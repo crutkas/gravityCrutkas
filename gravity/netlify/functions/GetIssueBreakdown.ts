@@ -3,6 +3,7 @@ import NetlifyGraph, { NetlifyGraphFunctionOptions } from "./netlifyGraph"
 
 export const handler = async (event, context) => {
   // By default, all API calls use no authentication
+  console.log(event.authlifyToken);
   let accessToken : NetlifyGraphFunctionOptions = {
     accessToken: event.authlifyToken
   }

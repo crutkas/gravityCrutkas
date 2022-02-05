@@ -144,7 +144,7 @@ const httpFetch = (siteId, options) => {
     req.write(reqBody)
     req.end()
   })
-}}
+}
 
 
 

@@ -1,8 +1,9 @@
-const { getSecrets, NetlifySecrets } = require("@netlify/functions");
+import { getSecrets, NetlifySecrets } from "@netlify/functions";
 const NetlifyGraph = require("./netlifyGraph")
 
 exports.handler = async (event, context) => {
-  let secrets = await getSecrets(); 
+  let secrets: NetlifySecrets = {};
+  secrets = await getSecrets();
   
   // By default, all API calls use no authentication
   let accessToken = secrets.gitHub?.bearerToken;

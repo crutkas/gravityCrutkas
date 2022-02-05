@@ -7929,6 +7929,7 @@ enum OneGraphCustomServiceAuthServiceEnum {
   MEETUP
   NETLIFY
   NOTION
+  OUTREACH
   PRODUCT_HUNT
   QUICKBOOKS
   SALESFORCE
@@ -11333,6 +11334,52 @@ type OneGraphNotionServiceAuth implements OneGraphServiceAuth {
   cname: String
 }
 
+"""Custom OAuth client for Outreach"""
+type OneGraphOutreachServiceAuth implements OneGraphServiceAuth {
+  """id for the service auth"""
+  id: String!
+
+  """
+  The service that the clientId and clientSecret belong to, e.g. "gmail"
+  """
+  service: String!
+
+  """clientId for the serviceAuth."""
+  clientId: String!
+
+  """clientSecret for the serviceAuth."""
+  clientSecret: String!
+
+  """
+  Optional pubsub topic for gmail auth. Required to use gmail subscriptions with custom OAuth credentials.
+  """
+  gmailWatchPubSubTopic: String
+
+  """
+  Developer token for the Google Ads api. Required to use the Google Ads api.
+  """
+  googleDeveloperToken: String
+
+  """
+  App name for Trello OAuth client. This is the name that will be displayed on the OAuth login form.
+  """
+  trelloAppName: String
+
+  """Optional scopes to use for the OAuth flow."""
+  scopes: [String!]
+
+  """
+  If true, the bearer token that is created fetchable by the user whose account the token grants access to.
+  """
+  revealTokens: Boolean!
+
+  """Custom OAuth redirect URI."""
+  customRedirectUri: String
+
+  """Custom CNAME host."""
+  cname: String
+}
+
 """Custom OAuth client for Product Hunt"""
 type OneGraphProductHuntServiceAuth implements OneGraphServiceAuth {
   """id for the service auth"""
@@ -12825,6 +12872,9 @@ input OneGraphServiceUserIds {
 
   """User id for Notion"""
   notion: String
+
+  """User id for Outreach"""
+  outreach: String
 
   """User id for Product Hunt"""
   productHunt: String
@@ -36608,6 +36658,7 @@ enum OneGraphServiceEnumArg {
   MEETUP
   NETLIFY
   NOTION
+  OUTREACH
   PRODUCT_HUNT
   QUICKBOOKS
   SALESFORCE
@@ -36849,6 +36900,7 @@ enum OneGraphServiceEnum {
   MEETUP
   NETLIFY
   NOTION
+  OUTREACH
   PRODUCT_HUNT
   QUICKBOOKS
   SALESFORCE
@@ -36942,6 +36994,7 @@ type OneGraphServicesMetadata {
   meetup: OneGraphServiceMetadata!
   netlify: OneGraphServiceMetadata!
   notion: OneGraphServiceMetadata!
+  outreach: OneGraphServiceMetadata!
   productHunt: OneGraphServiceMetadata!
   quickbooks: OneGraphServiceMetadata!
   salesforce: OneGraphServiceMetadata!

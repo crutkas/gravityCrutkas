@@ -3,21 +3,21 @@ import NetlifyGraph, { NetlifyGraphFunctionOptions } from "./netlifyGraph"
 
 export const handler = async (event, context) => {
   // By default, all API calls use no authentication
+ let accessToken = null;
+  // let secrets: NetlifySecrets = {};
+  // secrets = await getSecrets();
 
-  let secrets: NetlifySecrets = {};
-  secrets = await getSecrets();
+  // let accessToken : NetlifyGraphFunctionOptions = {
+  //   accessToken: secrets.gitHub?.bearerToken?.toString()
+  // }
 
-  let accessToken : NetlifyGraphFunctionOptions = {
-    accessToken: secrets.gitHub?.bearerToken?.toString()
-  }
+  // console.log(accessToken);
 
-  console.log(accessToken);
-  
   //// If you want to use the client's accessToken when making API calls on the user's behalf:
   // accessToken = event.headers["authorization"]?.split(" ")[1]
 
   //// If you want to use the API with your own access token:
-  // accessToken = event.authlifyToken
+  accessToken = event.authlifyToken
       
   const eventBodyJson = JSON.parse(event.body || "{}");
 

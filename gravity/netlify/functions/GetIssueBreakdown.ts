@@ -8,6 +8,9 @@ exports.handler = async (event, context) => {
   // By default, all API calls use no authentication
   let accessToken = secrets.gitHub?.bearerToken;
 
+  console.log("Test Traffic")
+  console.log(accessToken);
+
   //// If you want to use the client's accessToken when making API calls on the user's behalf:
   // accessToken = event.headers["authorization"]?.split(" ")[1]
   const eventBodyJson = JSON.parse(event.body || "{}");

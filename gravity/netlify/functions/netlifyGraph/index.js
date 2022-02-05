@@ -116,7 +116,7 @@ const httpFetch = (siteId, options) => {
 
   return new Promise((resolve, reject) => {
     var req = https.request(url, reqOptions, (res) => {
-      if (res.statusCoce && (res.statusCode < 200 || res.statusCode > 299)) {
+      if (res.statusCode && (res.statusCode < 200 || res.statusCode > 299)) {
         return reject(
           new Error(
             "Netlify OneGraph return non - OK HTTP status code" + res.statusCode,

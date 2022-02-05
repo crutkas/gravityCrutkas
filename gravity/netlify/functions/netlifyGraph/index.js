@@ -1,8 +1,8 @@
 // GENERATED VIA NETLIFY AUTOMATED DEV TOOLS, EDIT WITH CAUTION!
-const https = require("https")
-const crypto = require("crypto")
+import https from "https"
+import crypto from "crypto"
 
-exports.verifySignature = (input) => {
+export const verifySignature = (input) => {
   const secret = input.secret
   const body = input.body
   const signature = input.signature
@@ -116,7 +116,7 @@ const httpFetch = (siteId, options) => {
 
   return new Promise((resolve, reject) => {
     var req = https.request(url, reqOptions, (res) => {
-      if (res.statusCode && (res.statusCode < 200 || res.statusCode > 299)) {
+      if (res.statusCoce && (res.statusCode < 200 || res.statusCode > 299)) {
         return reject(
           new Error(
             "Netlify OneGraph return non - OK HTTP status code" + res.statusCode,
@@ -144,7 +144,7 @@ const httpFetch = (siteId, options) => {
     req.write(reqBody)
     req.end()
   })
-}
+}}
 
 
 
@@ -178,7 +178,7 @@ const fetchOneGraph = async function fetchOneGraph(input) {
 }
 
 
-exports.verifyRequestSignature = (request) => {
+export const verifyRequestSignature = (request) => {
   const event = request.event
   const secret = process.env.NETLIFY_GRAPH_WEBHOOK_SECRET
   const signature = event.headers['x-netlify-graph-signature']
@@ -194,7 +194,7 @@ exports.verifyRequestSignature = (request) => {
   return verifySignature({ secret, signature, body: body || '' })
 }
 
-exports.fetchGetIssueBreakdown = (
+export const fetchGetIssueBreakdown = (
       variables,
       options
     ) => {
@@ -207,7 +207,7 @@ exports.fetchGetIssueBreakdown = (
     }
 
 
-exports.fetchExampleQuery = (
+export const fetchExampleQuery = (
       variables,
       options
     ) => {
@@ -227,16 +227,16 @@ const functions = {
   /**
   * An example query to start with.
   */
-  fetchExampleQuery: exports.fetchExampleQuery,
+  fetchExampleQuery: fetchExampleQuery,
   /**
   * Issue that allows querying GitHub for more information about issues.
   */
-  fetchGetIssueBreakdown: exports.fetchGetIssueBreakdown
+  fetchGetIssueBreakdown: fetchGetIssueBreakdown
 }
 
-exports.default = functions
+export default functions
 
-exports.handler = async (event, context) => {
+export const handler = async (event, context) => {
       // return a 401 json response
       return {
         statusCode: 401,

@@ -1,8 +1,8 @@
 // GENERATED VIA NETLIFY AUTOMATED DEV TOOLS, EDIT WITH CAUTION!
-import https from "https"
-import crypto from "crypto"
+const https = require("https")
+const crypto = require("crypto")
 
-export const verifySignature = (input) => {
+exports.verifySignature = (input) => {
   const secret = input.secret
   const body = input.body
   const signature = input.signature
@@ -96,27 +96,29 @@ query ExampleQuery @netlify(id: """df4c8cc1-2f1e-4d69-89c6-d695f77d45fd""", doc:
 }`
 
 const httpFetch = (siteId, options) => {
-      var reqBody = options.body || null
-      const userHeaders = options.headers || {}
-      const headers = {
-        ...userHeaders,
-        'Content-Type': 'application/json',
-        'Content-Length': reqBody.length,
-      }
-   
-      var reqOptions = {
-        method: 'POST',
-        headers: headers,
-        timeout: 30000,
-      }
-      
+  const reqBody = options.body || null
+  const userHeaders = options.headers || {}
+  const headers = {
+    ...userHeaders,
+    'Content-Type': 'application/json',
+    'Content-Length': reqBody.length,
+  }
+
+  const reqOptions = {
+    method: 'POST',
+    headers,
+    timeout: 30000,
+  }
+
   const url = 'https://serve.onegraph.com/graphql?app_id=' + siteId
 
   const respBody = []
 
+  console.log("Call to:", url, "with:", reqOptions)
+
   return new Promise((resolve, reject) => {
-    var req = https.request(url, reqOptions, (res) => {
-      if (res.statusCode && (res.statusCode < 200 || res.statusCode > 299)) {
+    const req = https.request(url, reqOptions, (res) => {
+      if (res.statusCoce && (res.statusCode < 200 || res.statusCode > 299)) {
         return reject(
           new Error(
             "Netlify OneGraph return non - OK HTTP status code" + res.statusCode,
@@ -149,18 +151,18 @@ const httpFetch = (siteId, options) => {
 
 
 const fetchOneGraph = async function fetchOneGraph(input) {
-  const accessToken = input.accessToken 
   const query = input.query
   const operationName = input.operationName
   const variables = input.variables
   const options = input.options || {}
+  const accessToken = options.accessToken
 
   const siteId = options.siteId || process.env.SITE_ID
 
   const payload = {
-    query: query,
-    variables: variables,
-    operationName: operationName,
+    query,
+    variables,
+    operationName,
   }
 
   const result = await httpFetch(
@@ -178,7 +180,7 @@ const fetchOneGraph = async function fetchOneGraph(input) {
 }
 
 
-export const verifyRequestSignature = (request) => {
+exports.verifyRequestSignature = (request) => {
   const event = request.event
   const secret = process.env.NETLIFY_GRAPH_WEBHOOK_SECRET
   const signature = event.headers['x-netlify-graph-signature']
@@ -194,32 +196,32 @@ export const verifyRequestSignature = (request) => {
   return verifySignature({ secret, signature, body: body || '' })
 }
 
-export const fetchGetIssueBreakdown = (
-      variables,
-      options
-    ) => {
-      return fetchOneGraph({
-        query: operationsDoc,
-        operationName: "GetIssueBreakdown",
-        variables: variables,
-        options: options || {},
-      });
-    }
+exports.fetchGetIssueBreakdown = (
+  variables,
+  options
+) => {
+  return fetchOneGraph({
+    query: operationsDoc,
+    operationName: "GetIssueBreakdown",
+    variables,
+    options: options || {},
+  });
+}
 
 
-export const fetchExampleQuery = (
-      variables,
-      options
-    ) => {
-      return fetchOneGraph({
-        query: operationsDoc,
-        operationName: "ExampleQuery",
-        variables: variables,
-        options: options || {},
-      });
-    }
+exports.fetchExampleQuery = (
+  variables,
+  options
+) => {
+  return fetchOneGraph({
+    query: operationsDoc,
+    operationName: "ExampleQuery",
+    variables,
+    options: options || {},
+  });
+}
 
-  
+
 /**
  * The generated NetlifyGraph library with your operations
  */
@@ -227,21 +229,21 @@ const functions = {
   /**
   * An example query to start with.
   */
-  fetchExampleQuery: fetchExampleQuery,
+  fetchExampleQuery: exports.fetchExampleQuery,
   /**
   * Issue that allows querying GitHub for more information about issues.
   */
-  fetchGetIssueBreakdown: fetchGetIssueBreakdown
+  fetchGetIssueBreakdown: exports.fetchGetIssueBreakdown
 }
 
-export default functions
+exports.default = functions
 
-export const handler = async (event, context) => {
-      // return a 401 json response
-      return {
-        statusCode: 401,
-        body: JSON.stringify({
-          message: 'Unauthorized',
-        }),
-      }
-    }
+exports.handler = async (event, context) => {
+  // return a 401 json response
+  return {
+    statusCode: 401,
+    body: JSON.stringify({
+      message: 'Unauthorized',
+    }),
+  }
+}

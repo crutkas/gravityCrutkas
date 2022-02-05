@@ -1259,6 +1259,30 @@ type GithubSubscriptionRoot {
   statusEvent(input: GitHubStatusEventSubscriptionInput!): GitHubStatusEventSubscriptionPayload!
 }
 
+input OneGraphSubscriptionPollScheduleRepeatInput {
+  """How many minutes to wait before re-running the underlying query"""
+  minutes: Int!
+}
+
+input OneGraphSubscriptionPollScheduleInput {
+  """"""
+  every: OneGraphSubscriptionPollScheduleRepeatInput!
+}
+
+type OneGraphSubscriptionPollingQueryDiffPrevious {
+  payload: JSON
+  createdAt: String
+}
+
+type OneGraphSubscriptionPollingQueryDiff {
+  previous: OneGraphSubscriptionPollingQueryDiffPrevious
+}
+
+type PollingQuery {
+  query: Query!
+  diff: OneGraphSubscriptionPollingQueryDiff!
+}
+
 """
 Whether to include information about the API requests that OneGraph made to fulfill the query in the `extensions` field.
 """
@@ -1271,16 +1295,6 @@ enum OneGraphSubscriptionShowMetricsEnum {
 
   """Include summary metrics and full requests."""
   FULL_REQUESTS
-}
-
-input OneGraphSubscriptionPollScheduleRepeatInput {
-  """How many minutes to wait before re-running the underlying query"""
-  minutes: Int!
-}
-
-input OneGraphSubscriptionPollScheduleInput {
-  """"""
-  every: OneGraphSubscriptionPollScheduleRepeatInput!
 }
 
 """
@@ -1315,21 +1329,51 @@ input OneGraphSubscriptionAuthArg {
   gmail: OneGraphSubscriptionGmailAuthArg
 }
 
-type OneGraphSubscriptionPollingQueryDiffPrevious {
-  payload: JSON
-  createdAt: String
+input NpmPackagePublishedArg {
+  """
+  The names of packages to be notified about when published, e.g. ["graphql", "express", "fela"]
+  """
+  names: [String!]!
 }
 
-type OneGraphSubscriptionPollingQueryDiff {
-  previous: OneGraphSubscriptionPollingQueryDiffPrevious
+type NpmNewPackagePublishedSubscriptionPayload {
+  """Package being published"""
+  package: NpmPackage!
 }
 
-type PollingQuery {
-  query: Query!
-  diff: OneGraphSubscriptionPollingQueryDiff!
+"""Namespace for npm subscriptions."""
+type NpmSubscriptionRoot {
+  """Get notified when *any* package is published or updated on npm"""
+  allPublishActivity: NpmNewPackagePublishedSubscriptionPayload
+
+  """Get notified when a package is published or updated on npm"""
+  packagePublished(input: NpmPackagePublishedArg!): NpmNewPackagePublishedSubscriptionPayload
 }
 
 type Subscription {
+  npm(
+    """
+    Whether to include information about the API requests that OneGraph made to fulfill the query in the `extensions` field.
+    """
+    showMetrics: OneGraphSubscriptionShowMetricsEnum
+    secret: OneGraphSubscriptionSecretInput
+    auth: OneGraphSubscriptionAuthArg
+
+    """
+    Set to true when creating a subscription over a websocket that should only be retained and not sent over the websocket or a webhook. If set to true, `retainPayloads` must not be set to false.
+    """
+    retainedOnly: Boolean
+
+    """
+    Set to true to have OneGraph store payloads for this subscription. They payloads are available on the OneGraph dashboard from the app's `Subscription` page.
+    """
+    retainPayloads: Boolean
+
+    """
+    Webhook URL that will receive a POST request every time there is new data for the subscription. The endpoint should return a 200 within 30 seconds to be considered successful. If the request does not succeed, it will be retried.
+    """
+    webhookUrl: String
+  ): NpmSubscriptionRoot!
   poll(
     """
     Whether to include information about the API requests that OneGraph made to fulfill the query in the `extensions` field.
@@ -6891,6 +6935,12 @@ type GitHubMutation {
 }
 
 input SignoutServicesData {
+  authlifyTokenId: String
+
+  """
+  Auths to establish the anchor. Note that these auths won't be removed from the personal token.
+  """
+  anchorAuth: OneGraphServiceAuths
   services: [OneGraphServiceEnum!]!
 }
 
@@ -8413,7 +8463,83 @@ type OneGraphMutation {
   createNetlifyCliTestEvent(input: OneGraphCreateNetlifyTestEvent!): OneGraphCreateNetlifyTestResponsePayload!
 }
 
+enum NpmPublishPackagAccessEnumArg {
+  """
+  The package will only be visible to users with appropriate permissions (as decided by the registry).
+  """
+  PRIVATE
+
+  """The package will be publicly visible and installable by anyone."""
+  PUBLIC
+}
+
+enum NpmPublishPackageRegistryEnumArg {
+  """Publish to the npm registry"""
+  NPM
+
+  """
+  Publish to your GitHub package registry. Set your scope to the GitHub repository owner, and the name to repository name. For more info, see [GitHub's Package Repository](https://github.com/features/packages).
+  """
+  GITHUB
+}
+
+input OneGraphNpmPublishPackageFileArg {
+  contents: String!
+  path: String!
+}
+
+input NpmPublishPackageInputArg {
+  """Whether the package is public or private."""
+  access: NpmPublishPackagAccessEnumArg!
+
+  """
+  Which registry to publish to: npm, or a GitHub repository package repository.
+  """
+  registry: NpmPublishPackageRegistryEnumArg
+
+  """The list of files to include in the package"""
+  files: [OneGraphNpmPublishPackageFileArg!]!
+
+  """
+  package.json of your package. Must include `name` and `version` as strings fields at a minimum.
+  """
+  packageJson: JSON!
+}
+
+"""Results from running the publishPackage mutation"""
+type NpmPublishPackageResult {
+  """
+  Whether the package was successfully uploaded to npm. Note that due to the delay between uploading and indexing, you maybe have to wait until npm reflects the new version.OneGraphNpmPackage
+  
+  You can also use the `packagePublished` npm subscription to be notified when the new version of your package has been published.
+  """
+  successfullyUploaded: Boolean
+}
+
+"""The root for Npm mutations."""
+type NpmMutation {
+  """Publish a package to npm or GitHub package registry"""
+  publishPackage(
+    """Input for package publishing"""
+    input: NpmPublishPackageInputArg!
+  ): NpmPublishPackageResult
+}
+
 type Mutation {
+  """The root for npm mutations"""
+  npm(
+    """
+    Instruct OneGraph to use the auth associated with a particular user.
+    
+    Note that the user must have gone through the OneGraph oauth flow and logged in with an account with the userId provided in the auth. If there is no user with the account, you may get an auth/auth-missing error.
+    
+    The userIds for logged-in services can be found under `me.serviceMetadata.loggedInServices.foreignUserId`.
+    """
+    userIds: OneGraphServiceUserIds
+
+    """Optional OAuth tokens used to execute the query"""
+    auths: OneGraphServiceAuths
+  ): NpmMutation!
   oneGraph(
     """
     Instruct OneGraph to use the auth associated with a particular user.
@@ -12250,6 +12376,368 @@ type OneGraphServiceQuery {
   netlifyCliSession(id: String!): OneGraphNetlifyCliSession!
 }
 
+"""Download data for npm overall"""
+type NpmOverallDownloadPeriodData {
+  """The start date of download stats"""
+  start: String!
+
+  """The end date of download stats"""
+  end: String!
+
+  """
+  The download stats for all over npm for the given range. Check out explanation of how [npm download counts work](http://blog.npmjs.org/post/92574016600/numeric-precision-matters-how-npm-download-counts), including "what counts as a download?"
+  """
+  count: Int!
+
+  """
+  "Download data for all of npm for a given period in a daily breakdown"
+  """
+  perDay: [NpmDownloadsPerDay!]!
+}
+
+"""Information about download stats related to a package"""
+type NpmOverallDownloadData {
+  """The download status for all of npm over the last day"""
+  lastDay: NpmOverallDownloadPeriodData
+
+  """The download status for all of npm over the last week"""
+  lastWeek: NpmOverallDownloadPeriodData
+
+  """The download status for all of npm over the last month"""
+  lastMonth: NpmOverallDownloadPeriodData
+
+  """The download status for all of npm for a specific period"""
+  period(
+    """
+    The later date for download stats, e.g. 2018-12-07. Must be after `startDate`
+    """
+    endDate: String!
+
+    """
+    The earlier date for download stats, e.g. 2018-12-06. Must be before `endDate`
+    """
+    startDate: String!
+  ): NpmOverallDownloadPeriodData
+
+  """The download status for all of npm for a specific day"""
+  day(
+    """The specific date for download stats, e.g. 2018-12-06"""
+    date: String!
+  ): NpmOverallDownloadPeriodData
+}
+
+type NpmPackageMetadataDistTagEntry {
+  """The name of the tag"""
+  tag: String!
+
+  """The version as a string for this tag"""
+  versionString: String!
+
+  """The full version for this tag"""
+  version: NpmPackageVersion
+}
+
+type NpmPackageMetadataDistTagLatestEntry {
+  """The version as a string for this tag"""
+  versionString: String
+
+  """The full version for the `latest` tag"""
+  version: NpmPackageVersion
+}
+
+"""
+Tags can be used to provide an alias instead of version numbers. For example, a project might choose to have multiple streams of development and use a different tag for each stream, e.g., stable, beta, dev, canary.
+"""
+type NpmPackageDistTags {
+  """
+  By default, the latest tag is used by npm to identify the current version of a package
+  """
+  latest: NpmPackageMetadataDistTagLatestEntry
+
+  """Any custom tags used by the package maintainers"""
+  custom: [NpmPackageMetadataDistTagEntry!]!
+}
+
+type NpmDownloadsPerDay {
+  """The download count"""
+  count: Int
+
+  """"""
+  day: String
+}
+
+"""Download data for a given package"""
+type NpmPackageDownloadPeriodData {
+  """The start date of download stats"""
+  start: String!
+
+  """The end date of download stats"""
+  end: String!
+
+  """
+  The download stats for the given package and range. Check out explanation of how [npm download counts work](http://blog.npmjs.org/post/92574016600/numeric-precision-matters-how-npm-download-counts), including "what counts as a download?"
+  """
+  count: Int!
+
+  """
+  "Download data for this package and period in a daily breakdown"
+  """
+  perDay: [NpmDownloadsPerDay!]!
+}
+
+"""Information about download stats related to a package"""
+type NpmPackageDownloadData {
+  """The download status for this package over the last day"""
+  lastDay: NpmPackageDownloadPeriodData
+
+  """The download status for this package over the last week"""
+  lastWeek: NpmPackageDownloadPeriodData
+
+  """The download status for this package over the last month"""
+  lastMonth: NpmPackageDownloadPeriodData
+
+  """The download status for this package for a specific period"""
+  period(
+    """
+    The later date for download stats, e.g. 2018-12-07. Must be after `startDate`
+    """
+    endDate: String!
+
+    """
+    The earlier date for download stats, e.g. 2018-12-06. Must be before `endDate`
+    """
+    startDate: String!
+  ): NpmPackageDownloadPeriodData
+
+  """The download status for this package for a specific day"""
+  day(
+    """The specific date for download stats, e.g. 2018-12-06"""
+    date: String!
+  ): NpmPackageDownloadPeriodData
+}
+
+"""A npm package license"""
+type NpmPackageLicense {
+  """
+  The [SPDX identifier](https://spdx.org/licenses/) of the package's license
+  """
+  type: String
+
+  """A url for the full license"""
+  url: String
+}
+
+"""
+A mapping of other packages this version depends on to the required semver ranges
+"""
+type NpmPackageVersionDependency {
+  """The package name of the dependency"""
+  name: String
+
+  """The version of the package dependency"""
+  version: String
+}
+
+"""The dist object is generated by npm and may be relied upon"""
+type NpmPackageDist {
+  """"""
+  tarball: String
+
+  """"""
+  shasum: String
+}
+
+"""A npm package version"""
+type NpmPackageVersion {
+  """
+  `true` if this version is known to have a shrinkwrap that must be used to install it; false if this version is known not to have a shrinkwrap. If this field is undefined, the client must determine through other means if a shrinkwrap exists.
+  """
+  hasShrinkwrap: Boolean
+
+  """"""
+  from: String
+
+  """`package@version`, such as `npm@1.0.0`"""
+  id: String
+
+  """The version of node used to publish this"""
+  nodeVersion: String
+
+  """The version of the npm client used to publish this"""
+  npmVersion: String
+
+  """The dist object is generated by npm and may be relied upon."""
+  dist: NpmPackageDist
+
+  """The SHA-1 sum of the tarball"""
+  shasum: String
+
+  """A short description of the package at this version"""
+  description: String
+
+  """The package's entry point (e.g., `index.js` or `main.js`)"""
+  main: String
+
+  """The package name"""
+  name: String
+
+  """Deprecation warnings message of this version"""
+  deprecated: String
+
+  """The version string for this version"""
+  version: String
+
+  """"""
+  maintainers: [NpmPackageMaintainer!]
+
+  """
+  A mapping of other packages this version depends on to the required semver ranges
+  """
+  dependencies: [NpmPackageVersionDependency!]!
+
+  """
+  A mapping of package names to the required semver ranges of _development_ dependencies
+  """
+  devDependencies: [NpmPackageVersionDependency!]!
+
+  """
+  A mapping of package names to the required semver ranges of _optional_ dependencies
+  """
+  optionalDependencies: [NpmPackageVersionDependency!]!
+
+  """
+  A mapping of package names to the required semver ranges of _peer_ dependencies
+  """
+  peerDependencies: [NpmPackageVersionDependency!]!
+
+  """The license for this package"""
+  license: NpmPackageLicense!
+}
+
+"""Information on where bugs are filed for this package"""
+type NpmPackageBugs {
+  """"""
+  url: String
+}
+
+"""
+Specifies the repository where the source for this package might be found
+"""
+type NpmPackageRepository {
+  """"""
+  url: String
+
+  """"""
+  type: String
+  sourceRepository: NpmPackageSourceRepository
+}
+
+"""A package publishing time for a given version"""
+type NpmPackageTimeVersion {
+  """The package version"""
+  version: String
+
+  """The date this version was published"""
+  date: String
+}
+
+"""
+Information about when a package was created and last modified, as well as the publishing date for each version
+"""
+type NpmPackageTime {
+  """"""
+  created: String
+
+  """"""
+  modified: String
+
+  """Publishing information for each version of a package"""
+  versions: [NpmPackageTimeVersion!]!
+}
+
+"""A npm package maintainer"""
+type NpmPackageMaintainer {
+  """The package maintainer's email"""
+  email: String
+
+  """"""
+  name: String
+}
+
+"""A npm package"""
+type NpmPackage {
+  """The package name, used as an ID in CouchDB"""
+  id: String
+
+  """The revision number of this version of the document in CouchDB"""
+  rev: String
+
+  """The primary author of the npm package"""
+  author: NpmPackageMaintainer
+
+  """
+  A mapping of versions to the time published, along with created and modified timestamps
+  """
+  time: NpmPackageTime
+
+  """The package name"""
+  name: String
+
+  """A short description of the package"""
+  description: String
+
+  """
+  The first 64K of the README data for the most-recently published version of the package
+  """
+  readme: String
+
+  """"""
+  homepage: String
+
+  """The repository url as given in package.json, for the latest version"""
+  repository: NpmPackageRepository
+
+  """"""
+  keywords: [String!]
+
+  """"""
+  bugs: NpmPackageBugs
+
+  """The name of the file from which the readme data was taken"""
+  readmeFilename: String
+
+  """
+  People with permission to publish this package (NB: Not authoritative, but informational)
+  """
+  maintainers: [NpmPackageMaintainer!]
+
+  """A mapping of semver-compliant version numbers to version data"""
+  versions: [NpmPackageVersion!]!
+
+  """Summary download stats for a package"""
+  downloads: NpmPackageDownloadData!
+
+  """The license for this package"""
+  license: NpmPackageLicense!
+
+  """
+  Tags can be used to provide an alias instead of version numbers. For example, a project might choose to have multiple streams of development and use a different tag for each stream, e.g., stable, beta, dev, canary.
+  """
+  distTags: NpmPackageDistTags
+}
+
+"""The root for Npm."""
+type NpmQuery {
+  """Find a npm package member by its npm name, e.g. `"fela"`"""
+  package(
+    """Find the package by its name"""
+    name: String!
+  ): NpmPackage
+
+  """Overall download stats in the npm ecosystem"""
+  downloads: NpmOverallDownloadData
+}
+
 input OneGraphServiceUserIds {
   """User id for Adroll"""
   adroll: String
@@ -14624,6 +15112,8 @@ interface GitHubContribution {
   """
   user: GitHubUser!
 }
+
+union NpmPackageSourceRepository = GitHubRepository
 
 """Information about pagination in a connection."""
 type PageInfo {
@@ -36536,6 +37026,21 @@ type Query {
     """Optional OAuth tokens used to execute the query"""
     auths: OneGraphServiceAuths
   ): OneGraphNode
+
+  """The root for npm queries"""
+  npm(
+    """
+    Instruct OneGraph to use the auth associated with a particular user.
+    
+    Note that the user must have gone through the OneGraph oauth flow and logged in with an account with the userId provided in the auth. If there is no user with the account, you may get an auth/auth-missing error.
+    
+    The userIds for logged-in services can be found under `me.serviceMetadata.loggedInServices.foreignUserId`.
+    """
+    userIds: OneGraphServiceUserIds
+
+    """Optional OAuth tokens used to execute the query"""
+    auths: OneGraphServiceAuths
+  ): NpmQuery!
   oneGraph(
     """
     Instruct OneGraph to use the auth associated with a particular user.

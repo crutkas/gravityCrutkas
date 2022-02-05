@@ -87,11 +87,9 @@ export default {
     try {
       let secrets: NetlifySecrets = {};
       secrets = await getSecrets();
-      console.log("SECRETS")
-      console.log(secrets)
       if (secrets.gitHub) {
         // Empty array at first - we haven't yet gotten any issues.
-        let sanitizedIssues = [];
+        let sanitizedIssues = [] as any;
 
         // Initial call - let's get the first batch.
         let issues: Container = await getIssues(

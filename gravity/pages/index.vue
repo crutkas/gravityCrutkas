@@ -14,6 +14,10 @@ export interface Container {
 }
 
 export interface Data {
+  gitHub: GitHub;
+}
+
+export interface GitHub {
   repository: Repository;
 }
 

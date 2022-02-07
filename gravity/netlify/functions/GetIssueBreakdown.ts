@@ -28,27 +28,3 @@ export const handler = async (event, context) => {
     },
   }
 }
-
-/**
- * Client-side invocations:
- * Call your Netlify function from the browser (after saving
- * the code to `GetIssueBreakdown.js`) with these helpers:
- */
-
-/**
-async function fetchGetIssueBreakdown(netlifyGraphAuth, params) {
-  const {after} = params || {};
-  const resp = await fetch(`/.netlify/functions/GetIssueBreakdown`,
-    {
-      method: "POST",
-      body: JSON.stringify({"after": after}),
-      headers: {
-        ...netlifyGraphAuth?.authHeaders()
-      }
-    });
-
-    const text = await resp.text();
-
-    return JSON.parse(text);
-}
-*/

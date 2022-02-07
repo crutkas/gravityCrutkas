@@ -6,159 +6,159 @@
 </template>
 
 <script lang="ts">
-  import { getSecrets, NetlifySecrets } from "@netlify/functions";
-  import { Context } from "@nuxt/types";
-  import { Auth } from 'netlify-graph-auth';
-  import NetlifyGraphAuth = Auth.NetlifyGraphAuth;
-  import process from 'process';
+import { getSecrets, NetlifySecrets } from "@netlify/functions";
+import { Context } from "@nuxt/types";
+import { Auth } from 'netlify-graph-auth';
+import NetlifyGraphAuth = Auth.NetlifyGraphAuth;
+import process from 'process';
 
-  export interface Container {
+export interface Container {
     success: boolean;
     GetIssueBreakdownData: GetIssueBreakdownData;
-  }
+}
 
-  export interface GetIssueBreakdownData {
+export interface GetIssueBreakdownData {
     gitHub: GitHub;
-  }
+}
 
-  export interface GitHub {
+export interface GitHub {
     repository: Repository;
-  }
+}
 
-  export interface Repository {
+export interface Repository {
     issues: Issues;
-  }
+}
 
-  export interface Issues {
+export interface Issues {
     totalCount: number;
     pageInfo: PageInfo;
     edges: Edge[];
-  }
+}
 
-  export interface Edge {
+export interface Edge {
     node: EdgeNode;
-  }
+}
 
-  export interface EdgeNode {
+export interface EdgeNode {
     number: number;
     title: string;
     url: string;
     state: string;
     timelineItems: TimelineItems;
-  }
+}
 
-  export interface TimelineItems {
+export interface TimelineItems {
     totalCount: number;
     pageInfo: PageInfo;
     nodes: NodeElement[];
-  }
+}
 
-  export interface NodeElement {
+export interface NodeElement {
     source: Source;
-  }
+}
 
-  export interface Source {
+export interface Source {
     number?: number;
     state: string;
-  }
+}
 
-  export interface PageInfo {
+export interface PageInfo {
     startCursor: null | string;
     hasNextPage: boolean;
     endCursor: null | string;
-  }
+}
 
-  export interface IssueSummary {
+export interface IssueSummary {
     title: string;
     url: string;
     referencedIn: number;
-  }
+}
 
-  export interface Relationship {
+export interface Relationship {
     source: string;
     target: string;
     weight: number;
-  }
+}
 
-  export interface BarebonesNode {
+export interface BarebonesNode {
     id: string;
     group: number;
-  }
+}
 
-  export interface D3DataContainer {
+export interface D3DataContainer {
     nodes: Array<BarebonesNode>;
     links: Array<Relationship>;
-  }
+}
 
-  export default {
+export default {
     async asyncData(context: Context) {
-      try {
-        const auth = new NetlifyGraphAuth({
-          siteId: context.env.SITE_ID,
-        });
+        try {
+            const auth = new NetlifyGraphAuth({
+                siteId: context.env.SITE_ID,
+            });
 
-        if (auth) {
-        // Empty array at first - we haven't yet gotten any issues.
-        let sanitizedIssues = [] as any;
+            if (auth) {
+                // Empty array at first - we haven't yet gotten any issues.
+                let sanitizedIssues = [] as any;
 
-        let issues: Container = await fetchGetIssueBreakdown(auth, null);
+                let issues: Container = await fetchGetIssueBreakdown(auth, null);
 
-        // See if we have a stack of referenced issues
-        if (issues.GetIssueBreakdownData.gitHub.repository.issues.edges) {
-          // Insert the current stack of issues
-          sanitizedIssues.push(issues.GetIssueBreakdownData.gitHub.repository.issues.edges);
+                // See if we have a stack of referenced issues
+                if (issues.GetIssueBreakdownData.gitHub.repository.issues.edges) {
+                    // Insert the current stack of issues
+                    sanitizedIssues.push(issues.GetIssueBreakdownData.gitHub.repository.issues.edges);
 
-          // If there is more than one page, let's get all the issues.
-          while (issues.GetIssueBreakdownData.gitHub.repository.issues.pageInfo.hasNextPage) {
-            issues = await fetchGetIssueBreakdown(auth, {"after": issues.GetIssueBreakdownData.gitHub.repository.issues.pageInfo.endCursor});
-            sanitizedIssues.push(issues.GetIssueBreakdownData.gitHub.repository.issues.edges);
-          }
+                    // If there is more than one page, let's get all the issues.
+                    while (issues.GetIssueBreakdownData.gitHub.repository.issues.pageInfo.hasNextPage) {
+                        issues = await fetchGetIssueBreakdown(auth, { "after": issues.GetIssueBreakdownData.gitHub.repository.issues.pageInfo.endCursor });
+                        sanitizedIssues.push(issues.GetIssueBreakdownData.gitHub.repository.issues.edges);
+                    }
+                }
+
+                let relationships = computeLinks(sanitizedIssues);
+                let nodeStates = computeNodeStates(sanitizedIssues);
+                let summaries = computeSummary(sanitizedIssues);
+
+                let d3data: D3DataContainer = {
+                    nodes: nodeStates,
+                    links: relationships,
+                };
+
+                return {
+                    issueData: d3data,
+                    issueSummary: summaries,
+                };
+            } else {
+                return {
+                    issueData: { error: "No issue data available." },
+                    issueSummary: { error: "No summary available." },
+                };
+            }
+        } catch (e) {
+            context.error(e);
         }
-
-        let relationships = computeLinks(sanitizedIssues);
-        let nodeStates = computeNodeStates(sanitizedIssues);
-        let summaries = computeSummary(sanitizedIssues);
-
-        let d3data: D3DataContainer = {
-          nodes: nodeStates,
-          links: relationships,
-        };
-
-        return {
-          issueData: d3data,
-          issueSummary: summaries,
-        };
-      } else {
-        return {
-          issueData: { error: "No issue data available." },
-          issueSummary: { error: "No summary available." },
-        };
-      }
-    } catch (e) {
-      context.error(e);
-    }
-  },
-  created() {
-    console.log("Created!");
-  },
+    },
+    created() {
+        console.log("Created!");
+    },
 };
 
 async function fetchGetIssueBreakdown(netlifyGraphAuth, params) {
-  const {after} = params || {};
-  console.log("After param: " + after)
-  const resp = await fetch(`/.netlify/functions/GetIssueBreakdown`,
-  {
-    method: "POST",
-    body: JSON.stringify({"after": after}),
-    headers: {
-      ...netlifyGraphAuth?.authHeaders()
-    }
-  });
+    const { after } = params || {};
+    console.log("After param: " + after)
+    const resp = await fetch(`/.netlify/functions/GetIssueBreakdown`,
+        {
+            method: "POST",
+            body: JSON.stringify({ "after": after }),
+            headers: {
+                ...netlifyGraphAuth?.authHeaders()
+            }
+        });
 
-  const text = await resp.json();
-  console.log(text);
+    const text = await resp.json();
+    console.log(text);
 
-  return text;
+    return text;
 }
 
 // Returns the list of issues along with cross-referenced
@@ -167,126 +167,126 @@ async function fetchGetIssueBreakdown(netlifyGraphAuth, params) {
 // The `after` argument is used to set the cursor for
 // query pagination in cases where the repository has a lot of issues.
 async function getIssues(token: string | null, after: string | null) {
-  console.log("Trying to get issues...");
+    console.log("Trying to get issues...");
 
-  const headers = {
-    Authorization: `bearer ${token}`,
-  };
-
-  let body = {};
-
-  if (after) {
-    body = {
-      query: `query {repository(owner:"microsoft",name:"powertoys"){issues(first:100, states:OPEN, after:"${after}"){totalCount pageInfo{startCursor hasNextPage endCursor}edges{node{number title url state timelineItems(first:200,itemTypes:CROSS_REFERENCED_EVENT){totalCount pageInfo{startCursor hasNextPage endCursor}nodes{...on CrossReferencedEvent{source{...on Issue{number state}}}}}}}}}}`,
+    const headers = {
+        Authorization: `bearer ${token}`,
     };
-  } else {
-    body = {
-      query:
-      'query {repository(owner:"microsoft",name:"powertoys"){issues(first:100, states:OPEN){totalCount pageInfo{startCursor hasNextPage endCursor}edges{node{number title url state timelineItems(first:200,itemTypes:CROSS_REFERENCED_EVENT){totalCount pageInfo{startCursor hasNextPage endCursor}nodes{...on CrossReferencedEvent{source{...on Issue{number state}}}}}}}}}}',
-    };
-  }
 
-  const response = await fetch("https://api.github.com/graphql", {
-    method: "POST",
-    body: JSON.stringify(body),
-    headers: headers,
-  });
+    let body = {};
 
-  const data = await response.json();
-  return data;
+    if (after) {
+        body = {
+            query: `query {repository(owner:"microsoft",name:"powertoys"){issues(first:100, states:OPEN, after:"${after}"){totalCount pageInfo{startCursor hasNextPage endCursor}edges{node{number title url state timelineItems(first:200,itemTypes:CROSS_REFERENCED_EVENT){totalCount pageInfo{startCursor hasNextPage endCursor}nodes{...on CrossReferencedEvent{source{...on Issue{number state}}}}}}}}}}`,
+        };
+    } else {
+        body = {
+            query:
+                'query {repository(owner:"microsoft",name:"powertoys"){issues(first:100, states:OPEN){totalCount pageInfo{startCursor hasNextPage endCursor}edges{node{number title url state timelineItems(first:200,itemTypes:CROSS_REFERENCED_EVENT){totalCount pageInfo{startCursor hasNextPage endCursor}nodes{...on CrossReferencedEvent{source{...on Issue{number state}}}}}}}}}}',
+        };
+    }
+
+    const response = await fetch("https://api.github.com/graphql", {
+        method: "POST",
+        body: JSON.stringify(body),
+        headers: headers,
+    });
+
+    const data = await response.json();
+    return data;
 }
 
 function computeSummary(nodeContainer: Array<Edge[]> | null) {
-  let summaryItems: Array<IssueSummary> = [];
+    let summaryItems: Array<IssueSummary> = [];
 
-  if (nodeContainer) {
-    nodeContainer.forEach(function (nodeBlock) {
-      nodeBlock.forEach(function (node) {
-        let summary: IssueSummary = {
-          url: "",
-          title: "",
-          referencedIn: 0,
-        };
-        summary.url = node.node.url;
-        summary.title = node.node.title;
-        summary.referencedIn = node.node.timelineItems.totalCount;
+    if (nodeContainer) {
+        nodeContainer.forEach(function (nodeBlock) {
+            nodeBlock.forEach(function (node) {
+                let summary: IssueSummary = {
+                    url: "",
+                    title: "",
+                    referencedIn: 0,
+                };
+                summary.url = node.node.url;
+                summary.title = node.node.title;
+                summary.referencedIn = node.node.timelineItems.totalCount;
 
-        summaryItems.push(summary);
-      });
-    });
-  }
+                summaryItems.push(summary);
+            });
+        });
+    }
 
-  return summaryItems;
+    return summaryItems;
 }
 
 function computeNodeStates(nodeContainer: Array<Edge[]> | null) {
-  let nodeStates: Array<BarebonesNode> = [];
+    let nodeStates: Array<BarebonesNode> = [];
 
-  if (nodeContainer) {
-    nodeContainer.forEach(function (nodeBlock) {
-      nodeBlock.forEach(function (node) {
-        let topLevelNode: BarebonesNode = {
-          id: node.node.number.toString(),
-          group: equalsIgnoringCase(node.node.state, "OPEN") ? 1 : 0,
-        };
+    if (nodeContainer) {
+        nodeContainer.forEach(function (nodeBlock) {
+            nodeBlock.forEach(function (node) {
+                let topLevelNode: BarebonesNode = {
+                    id: node.node.number.toString(),
+                    group: equalsIgnoringCase(node.node.state, "OPEN") ? 1 : 0,
+                };
 
-        nodeStates.push(topLevelNode);
+                nodeStates.push(topLevelNode);
 
-        node.node.timelineItems.nodes.forEach(function (referenceNode) {
-          if (referenceNode.source.number) {
-            let nestedNode: BarebonesNode = {
-              id: referenceNode.source.number.toString(),
-              group: equalsIgnoringCase(referenceNode.source.state, "OPEN")
-              ? 1
-              : 0,
-            };
+                node.node.timelineItems.nodes.forEach(function (referenceNode) {
+                    if (referenceNode.source.number) {
+                        let nestedNode: BarebonesNode = {
+                            id: referenceNode.source.number.toString(),
+                            group: equalsIgnoringCase(referenceNode.source.state, "OPEN")
+                                ? 1
+                                : 0,
+                        };
 
-            nodeStates.push(nestedNode);
-          }
+                        nodeStates.push(nestedNode);
+                    }
+                });
+            });
         });
-      });
-    });
-  }
+    }
 
-  let filteredNodeStates = nodeStates.filter(
-    (value, index, array) => array.findIndex((t) => t.id === value.id) === index
+    let filteredNodeStates = nodeStates.filter(
+        (value, index, array) => array.findIndex((t) => t.id === value.id) === index
     );
-  return filteredNodeStates;
+    return filteredNodeStates;
 }
 
 function computeLinks(nodeContainer: Array<Edge[]> | null) {
-  let relationships: any = [];
+    let relationships: any = [];
 
-  if (nodeContainer) {
-    nodeContainer.forEach(function (nodeBlock) {
-      nodeBlock.forEach(function (node) {
-        let number = node.node.number;
-        node.node.timelineItems.nodes.forEach(function (referenceNode) {
-          if (referenceNode.source.number) {
-            let relationship: Relationship = {
-              source: number.toString(),
-              target: referenceNode.source.number.toString(),
-              weight: 6,
-            };
-            relationships.push(relationship);
-          }
+    if (nodeContainer) {
+        nodeContainer.forEach(function (nodeBlock) {
+            nodeBlock.forEach(function (node) {
+                let number = node.node.number;
+                node.node.timelineItems.nodes.forEach(function (referenceNode) {
+                    if (referenceNode.source.number) {
+                        let relationship: Relationship = {
+                            source: number.toString(),
+                            target: referenceNode.source.number.toString(),
+                            weight: 6,
+                        };
+                        relationships.push(relationship);
+                    }
+                });
+            });
         });
-      });
-    });
 
-    let filteredRelationships = relationships.filter(function (
-      entity: Relationship
-      ) {
-      return entity.source != null && entity.target != null;
-    });
+        let filteredRelationships = relationships.filter(function (
+            entity: Relationship
+        ) {
+            return entity.source != null && entity.target != null;
+        });
 
-    return filteredRelationships;
-  } else {
-    return { error: "Could not compute links." };
-  }
+        return filteredRelationships;
+    } else {
+        return { error: "Could not compute links." };
+    }
 }
 
 function equalsIgnoringCase(text: string, other: string) {
-  return text.localeCompare(other, undefined, { sensitivity: "base" }) === 0;
+    return text.localeCompare(other, undefined, { sensitivity: "base" }) === 0;
 }
 </script>

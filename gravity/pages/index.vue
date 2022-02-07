@@ -92,8 +92,11 @@ export interface D3DataContainer {
 export default {
   async asyncData(context: Context) {
     try {
+      console.log(context.env);
+      console.log(context.env.SITE_ID);
+      
       const auth = new NetlifyGraphAuth({
-        siteId: process.env.SITE_ID,
+        siteId: context.env.SITE_ID,
       });
 
       if (auth) {

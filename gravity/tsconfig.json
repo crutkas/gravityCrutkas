@@ -8,7 +8,7 @@
       "ESNext.AsyncIterable",
       "DOM"
     ],
-    "false": true,
+    "esModuleInterop": false,
     "allowJs": true,
     "sourceMap": true,
     "strict": true,

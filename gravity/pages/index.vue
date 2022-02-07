@@ -91,24 +91,17 @@ export default {
         // Empty array at first - we haven't yet gotten any issues.
         let sanitizedIssues = [] as any;
 
-        // Initial call - let's get the first batch.
-        let issues: Container = await getIssues(
-          secrets.gitHub?.bearerToken,
-          null
-        );
+        let issues: Container = await fetchGetIssueBreakdown(secrets, null);
 
         // See if we have a stack of referenced issues
-        if (issues.data.repository.issues.edges) {
+        if (issues.data.gitHub.repository.issues.edges) {
           // Insert the current stack of issues
-          sanitizedIssues.push(issues.data.repository.issues.edges);
+          sanitizedIssues.push(issues.data.gitHub.repository.issues.edges);
 
           // If there is more than one page, let's get all the issues.
-          while (issues.data.repository.issues.pageInfo.hasNextPage) {
-            issues = await getIssues(
-              secrets.gitHub?.bearerToken,
-              issues.data.repository.issues.pageInfo.endCursor
-            );
-            sanitizedIssues.push(issues.data.repository.issues.edges);
+          while (issues.data.gitHub.repository.issues.pageInfo.hasNextPage) {
+            issues = await fetchGetIssueBreakdown(secrets, issues.data.gitHub.repository.issues.pageInfo.endCursor);
+            sanitizedIssues.push(issues.data.gitHub.repository.issues.edges);
           }
         }
 
@@ -139,6 +132,23 @@ export default {
     console.log("Created!");
   },
 };
+
+async function fetchGetIssueBreakdown(netlifyGraphAuth, params) {
+  console.log("Fetching with " + params)
+  const {after} = params || {};
+  const resp = await fetch(`/.netlify/functions/GetIssueBreakdown`,
+    {
+      method: "POST",
+      body: JSON.stringify({"after": after}),
+      headers: {
+        ...netlifyGraphAuth?.authHeaders()
+      }
+    });
+
+    const text = await resp.text();
+
+    return JSON.parse(text);
+}
 
 // Returns the list of issues along with cross-referenced
 // issues/PRs in the same repository.

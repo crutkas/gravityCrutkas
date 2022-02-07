@@ -93,7 +93,7 @@ export default {
   async asyncData(context: Context) {
     try {
       const auth = new NetlifyGraphAuth({
-        siteId: process.env.SITE_ID,
+        siteId: process.env.NUXT_ENV_SITE_ID,
       });
 
       if (auth) {

@@ -43,6 +43,11 @@ export default {
   modules: [
   ],
 
+  // Declaring environment variables that need to be accessible.
+  env: {
+    SITE_ID: process.env.SITE_ID || 'UNKNOWN_SITE_ID'
+  }
+
   // Build Configuration: https://go.nuxtjs.dev/config-build
   build: {
     standalone: true,

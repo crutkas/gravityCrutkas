@@ -8,7 +8,7 @@
 <script lang="ts">
 import { getSecrets, NetlifySecrets } from "@netlify/functions";
 import { Context } from "@nuxt/types";
-import { NetlifyGraphAuth } from 'netlify-graph-auth';
+import NetlifyGraphAuth from 'netlify-graph-auth';
 import process from 'process';
 
 export interface Container {

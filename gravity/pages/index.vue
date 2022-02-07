@@ -102,6 +102,7 @@ export default {
         let sanitizedIssues = [] as any;
 
         let issues: Container = await fetchGetIssueBreakdown(auth, null);
+        console.log(issues);
 
         // See if we have a stack of referenced issues
         if (issues.data.gitHub.repository.issues.edges) {

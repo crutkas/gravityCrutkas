@@ -6,103 +6,102 @@
 </template>
 
 <script lang="ts">
-import { getSecrets, NetlifySecrets } from "@netlify/functions";
-import { Context } from "@nuxt/types";
-import { Auth } from 'netlify-graph-auth';
-import NetlifyGraphAuth = Auth.NetlifyGraphAuth;
-import process from 'process';
+  import { getSecrets, NetlifySecrets } from "@netlify/functions";
+  import { Context } from "@nuxt/types";
+  import { Auth } from 'netlify-graph-auth';
+  import NetlifyGraphAuth = Auth.NetlifyGraphAuth;
+  import process from 'process';
 
-export interface Container {
-  success: boolean;
-  GetIssueBreakdownData: GetIssueBreakdownData;
-}
+  export interface Container {
+    success: boolean;
+    GetIssueBreakdownData: GetIssueBreakdownData;
+  }
 
-export interface GetIssueBreakdownData {
-  gitHub: GitHub;
-}
+  export interface GetIssueBreakdownData {
+    gitHub: GitHub;
+  }
 
-export interface GitHub {
-  repository: Repository;
-}
+  export interface GitHub {
+    repository: Repository;
+  }
 
-export interface Repository {
-  issues: Issues;
-}
+  export interface Repository {
+    issues: Issues;
+  }
 
-export interface Issues {
-  totalCount: number;
-  pageInfo: PageInfo;
-  edges: Edge[];
-}
+  export interface Issues {
+    totalCount: number;
+    pageInfo: PageInfo;
+    edges: Edge[];
+  }
 
-export interface Edge {
-  node: EdgeNode;
-}
+  export interface Edge {
+    node: EdgeNode;
+  }
 
-export interface EdgeNode {
-  number: number;
-  title: string;
-  url: string;
-  state: string;
-  timelineItems: TimelineItems;
-}
+  export interface EdgeNode {
+    number: number;
+    title: string;
+    url: string;
+    state: string;
+    timelineItems: TimelineItems;
+  }
 
-export interface TimelineItems {
-  totalCount: number;
-  pageInfo: PageInfo;
-  nodes: NodeElement[];
-}
+  export interface TimelineItems {
+    totalCount: number;
+    pageInfo: PageInfo;
+    nodes: NodeElement[];
+  }
 
-export interface NodeElement {
-  source: Source;
-}
+  export interface NodeElement {
+    source: Source;
+  }
 
-export interface Source {
-  number?: number;
-  state: string;
-}
+  export interface Source {
+    number?: number;
+    state: string;
+  }
 
-export interface PageInfo {
-  startCursor: null | string;
-  hasNextPage: boolean;
-  endCursor: null | string;
-}
+  export interface PageInfo {
+    startCursor: null | string;
+    hasNextPage: boolean;
+    endCursor: null | string;
+  }
 
-export interface IssueSummary {
-  title: string;
-  url: string;
-  referencedIn: number;
-}
+  export interface IssueSummary {
+    title: string;
+    url: string;
+    referencedIn: number;
+  }
 
-export interface Relationship {
-  source: string;
-  target: string;
-  weight: number;
-}
+  export interface Relationship {
+    source: string;
+    target: string;
+    weight: number;
+  }
 
-export interface BarebonesNode {
-  id: string;
-  group: number;
-}
+  export interface BarebonesNode {
+    id: string;
+    group: number;
+  }
 
-export interface D3DataContainer {
-  nodes: Array<BarebonesNode>;
-  links: Array<Relationship>;
-}
+  export interface D3DataContainer {
+    nodes: Array<BarebonesNode>;
+    links: Array<Relationship>;
+  }
 
-export default {
-  async asyncData(context: Context) {
-    try {
-      const auth = new NetlifyGraphAuth({
-        siteId: context.env.SITE_ID,
-      });
+  export default {
+    async asyncData(context: Context) {
+      try {
+        const auth = new NetlifyGraphAuth({
+          siteId: context.env.SITE_ID,
+        });
 
-      if (auth) {
+        if (auth) {
         // Empty array at first - we haven't yet gotten any issues.
         let sanitizedIssues = [] as any;
 
         let issues: Container = await fetchGetIssueBreakdown(auth, null);
-        console.log(issues);
 
         // See if we have a stack of referenced issues
         if (issues.GetIssueBreakdownData.gitHub.repository.issues.edges) {
@@ -111,9 +110,7 @@ export default {
 
           // If there is more than one page, let's get all the issues.
           while (issues.GetIssueBreakdownData.gitHub.repository.issues.pageInfo.hasNextPage) {
-            console.log(issues.GetIssueBreakdownData.gitHub.repository.issues.pageInfo.endCursor);
             issues = await fetchGetIssueBreakdown(auth, {"after": issues.GetIssueBreakdownData.gitHub.repository.issues.pageInfo.endCursor});
-            console.log(issues.GetIssueBreakdownData.gitHub.repository.issues.pageInfo.endCursor);
             sanitizedIssues.push(issues.GetIssueBreakdownData.gitHub.repository.issues.edges);
           }
         }
@@ -147,22 +144,21 @@ export default {
 };
 
 async function fetchGetIssueBreakdown(netlifyGraphAuth, params) {
-  console.log("Fetching with " + params)
   const {after} = params || {};
   console.log("After param: " + after)
   const resp = await fetch(`/.netlify/functions/GetIssueBreakdown`,
-    {
-      method: "POST",
-      body: JSON.stringify({"after": after}),
-      headers: {
-        ...netlifyGraphAuth?.authHeaders()
-      }
-    });
+  {
+    method: "POST",
+    body: JSON.stringify({"after": after}),
+    headers: {
+      ...netlifyGraphAuth?.authHeaders()
+    }
+  });
 
-    const text = await resp.json();
-    console.log(text);
+  const text = await resp.json();
+  console.log(text);
 
-    return text;
+  return text;
 }
 
 // Returns the list of issues along with cross-referenced
@@ -186,7 +182,7 @@ async function getIssues(token: string | null, after: string | null) {
   } else {
     body = {
       query:
-        'query {repository(owner:"microsoft",name:"powertoys"){issues(first:100, states:OPEN){totalCount pageInfo{startCursor hasNextPage endCursor}edges{node{number title url state timelineItems(first:200,itemTypes:CROSS_REFERENCED_EVENT){totalCount pageInfo{startCursor hasNextPage endCursor}nodes{...on CrossReferencedEvent{source{...on Issue{number state}}}}}}}}}}',
+      'query {repository(owner:"microsoft",name:"powertoys"){issues(first:100, states:OPEN){totalCount pageInfo{startCursor hasNextPage endCursor}edges{node{number title url state timelineItems(first:200,itemTypes:CROSS_REFERENCED_EVENT){totalCount pageInfo{startCursor hasNextPage endCursor}nodes{...on CrossReferencedEvent{source{...on Issue{number state}}}}}}}}}}',
     };
   }
 
@@ -241,8 +237,8 @@ function computeNodeStates(nodeContainer: Array<Edge[]> | null) {
             let nestedNode: BarebonesNode = {
               id: referenceNode.source.number.toString(),
               group: equalsIgnoringCase(referenceNode.source.state, "OPEN")
-                ? 1
-                : 0,
+              ? 1
+              : 0,
             };
 
             nodeStates.push(nestedNode);
@@ -254,7 +250,7 @@ function computeNodeStates(nodeContainer: Array<Edge[]> | null) {
 
   let filteredNodeStates = nodeStates.filter(
     (value, index, array) => array.findIndex((t) => t.id === value.id) === index
-  );
+    );
   return filteredNodeStates;
 }
 
@@ -280,7 +276,7 @@ function computeLinks(nodeContainer: Array<Edge[]> | null) {
 
     let filteredRelationships = relationships.filter(function (
       entity: Relationship
-    ) {
+      ) {
       return entity.source != null && entity.target != null;
     });
 

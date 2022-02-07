@@ -13,10 +13,11 @@ import NetlifyGraphAuth = Auth.NetlifyGraphAuth;
 import process from 'process';
 
 export interface Container {
-  data: Data;
+  success: boolean;
+  data: GetIssueBreakdownData;
 }
 
-export interface Data {
+export interface GetIssueBreakdownData {
   gitHub: GitHub;
 }
 

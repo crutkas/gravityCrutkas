@@ -112,7 +112,7 @@ export default {
           // If there is more than one page, let's get all the issues.
           while (issues.GetIssueBreakdownData.gitHub.repository.issues.pageInfo.hasNextPage) {
             console.log(issues.GetIssueBreakdownData.gitHub.repository.issues.pageInfo.endCursor);
-            issues = await fetchGetIssueBreakdown(auth, issues.GetIssueBreakdownData.gitHub.repository.issues.pageInfo.endCursor);
+            issues = await fetchGetIssueBreakdown(auth, {"after": issues.GetIssueBreakdownData.gitHub.repository.issues.pageInfo.endCursor});
             console.log(issues.GetIssueBreakdownData.gitHub.repository.issues.pageInfo.endCursor);
             sanitizedIssues.push(issues.GetIssueBreakdownData.gitHub.repository.issues.edges);
           }
@@ -149,6 +149,7 @@ export default {
 async function fetchGetIssueBreakdown(netlifyGraphAuth, params) {
   console.log("Fetching with " + params)
   const {after} = params || {};
+  console.log("After param: " + after)
   const resp = await fetch(`/.netlify/functions/GetIssueBreakdown`,
     {
       method: "POST",

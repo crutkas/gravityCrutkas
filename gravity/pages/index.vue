@@ -111,7 +111,7 @@ export default {
 
           // If there is more than one page, let's get all the issues.
           while (issues.GetIssueBreakdownData.gitHub.repository.issues.pageInfo.hasNextPage) {
-            issues = await fetchGetIssueBreakdown(auth, issues.data.gitHub.repository.issues.pageInfo.endCursor);
+            issues = await fetchGetIssueBreakdown(auth, issues.GetIssueBreakdownData.gitHub.repository.issues.pageInfo.endCursor);
             sanitizedIssues.push(issues.GetIssueBreakdownData.gitHub.repository.issues.edges);
           }
         }

@@ -91,10 +91,9 @@ export interface D3DataContainer {
 export default {
   async asyncData(context: Context) {
     try {
-      const auth = new NetlifyGraphAuth({
-        siteId: process.env.SITE_ID,
-      });
-
+      const auth = new NetlifyGraphAuth();
+      auth.siteId = process.env.SITE_ID;
+      
       if (auth) {
         // Empty array at first - we haven't yet gotten any issues.
         let sanitizedIssues = [] as any;

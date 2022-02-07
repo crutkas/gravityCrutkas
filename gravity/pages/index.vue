@@ -92,9 +92,6 @@ export interface D3DataContainer {
 export default {
   async asyncData(context: Context) {
     try {
-      console.log(context.env);
-      console.log(context.env.SITE_ID);
-      
       const auth = new NetlifyGraphAuth({
         siteId: context.env.SITE_ID,
       });
@@ -157,9 +154,10 @@ async function fetchGetIssueBreakdown(netlifyGraphAuth, params) {
       }
     });
 
-    const text = await resp.text();
+    const text = await resp.json();
+    console.log(text);
 
-    return JSON.parse(text);
+    return text;
 }
 
 // Returns the list of issues along with cross-referenced

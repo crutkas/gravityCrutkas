@@ -14,7 +14,7 @@ import process from 'process';
 
 export interface Container {
   success: boolean;
-  data: GetIssueBreakdownData;
+  GetIssueBreakdownData: GetIssueBreakdownData;
 }
 
 export interface GetIssueBreakdownData {
@@ -105,14 +105,14 @@ export default {
         console.log(issues);
 
         // See if we have a stack of referenced issues
-        if (issues.data.gitHub.repository.issues.edges) {
+        if (issues.GetIssueBreakdownData.gitHub.repository.issues.edges) {
           // Insert the current stack of issues
-          sanitizedIssues.push(issues.data.gitHub.repository.issues.edges);
+          sanitizedIssues.push(issues.GetIssueBreakdownData.gitHub.repository.issues.edges);
 
           // If there is more than one page, let's get all the issues.
-          while (issues.data.gitHub.repository.issues.pageInfo.hasNextPage) {
+          while (issues.GetIssueBreakdownData.gitHub.repository.issues.pageInfo.hasNextPage) {
             issues = await fetchGetIssueBreakdown(auth, issues.data.gitHub.repository.issues.pageInfo.endCursor);
-            sanitizedIssues.push(issues.data.gitHub.repository.issues.edges);
+            sanitizedIssues.push(issues.GetIssueBreakdownData.gitHub.repository.issues.edges);
           }
         }
 

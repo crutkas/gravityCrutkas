@@ -1,5 +1,5 @@
 import { getSecrets, NetlifySecrets } from '@netlify/functions'
-import NetlifyGraph from './netlifyGraph'
+import NetlifyGraph, { NetlifyGraphFunctionOptions } from './netlifyGraph'
 
 export const handler = async (event, context) => {
   const accessToken = event.authlifyToken

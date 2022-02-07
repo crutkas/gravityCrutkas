@@ -39,11 +39,6 @@ query GetIssueBreakdown($after: String) @netlify(id: """c67c5c11-cbc4-48ed-8ac8-
       }
     }
   }
-  spotify {
-    me {
-      country
-    }
-  }
 }
 
 query ExampleQuery @netlify(id: """df4c8cc1-2f1e-4d69-89c6-d695f77d45fd""", doc: """An example query to start with.""") {

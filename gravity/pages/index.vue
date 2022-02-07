@@ -8,7 +8,7 @@
 <script lang="ts">
 import { getSecrets, NetlifySecrets } from "@netlify/functions";
 import { Context } from "@nuxt/types";
-import NetlifyGraphAuth from 'netlify-graph-auth';
+import { NetlifyGraphAuth } from 'netlify-graph-auth';
 import process from 'process';
 
 export interface Container {
@@ -99,7 +99,7 @@ export default {
         // Empty array at first - we haven't yet gotten any issues.
         let sanitizedIssues = [] as any;
 
-        let issues: Container = await fetchGetIssueBreakdown(secrets, null);
+        let issues: Container = await fetchGetIssueBreakdown(auth, null);
 
         // See if we have a stack of referenced issues
         if (issues.data.gitHub.repository.issues.edges) {
@@ -108,7 +108,7 @@ export default {
 
           // If there is more than one page, let's get all the issues.
           while (issues.data.gitHub.repository.issues.pageInfo.hasNextPage) {
-            issues = await fetchGetIssueBreakdown(secrets, issues.data.gitHub.repository.issues.pageInfo.endCursor);
+            issues = await fetchGetIssueBreakdown(auth, issues.data.gitHub.repository.issues.pageInfo.endCursor);
             sanitizedIssues.push(issues.data.gitHub.repository.issues.edges);
           }
         }

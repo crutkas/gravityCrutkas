@@ -113,6 +113,7 @@ export default {
           while (issues.GetIssueBreakdownData.gitHub.repository.issues.pageInfo.hasNextPage) {
             console.log(issues.GetIssueBreakdownData.gitHub.repository.issues.pageInfo.endCursor);
             issues = await fetchGetIssueBreakdown(auth, issues.GetIssueBreakdownData.gitHub.repository.issues.pageInfo.endCursor);
+            console.log(issues.GetIssueBreakdownData.gitHub.repository.issues.pageInfo.endCursor);
             sanitizedIssues.push(issues.GetIssueBreakdownData.gitHub.repository.issues.edges);
           }
         }

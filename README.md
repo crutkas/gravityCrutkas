@@ -10,7 +10,7 @@ It leverages [Netlify Graph](http://ntl.fyi/netlify-graph-docs) to authenticate 
 
 ## Running
 
-To get the application running, you will need to deploy it to Netlify and ensure that you have connected GitHub with Netlify Graph in your website.
+To get the application running, you will need to deploy it to Netlify and ensure that you have connected GitHub with **Netlify Graph** and **API Authentication** in your website.
 
 ![GitHub enabled as a connection in Netlify Graph](media/gravity-auth.gif)
 

@@ -4,7 +4,7 @@
 
 A web application designed to visualize cross-referenced issues in a GitHub repository.
 
-It leverages [Netlify Graph](http://ntl.fyi/netlify-graph-docs) to authenticate against GitHub, and then execute one of stored GraphQL queries.
+It leverages [Netlify Graph](http://ntl.fyi/netlify-graph-docs) to authenticate against GitHub, and then execute one of stored GraphQL queries. The data is then rendered with the help of [d3.js](https://d3js.org/).
 
 ![Demo of the Gravity tool](media/gravity-demo.gif)
 

@@ -1,2 +1,5 @@
 [graph]
   moduleType = "esm"
+
+[build]
+  base = "gravity/"

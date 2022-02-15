@@ -20,6 +20,7 @@ To edit the pre-programmed GraphQL queries:
 
 1. Install the Netlify CLI: `npm install netlify-cli -g`
 2. Open the repository folder in your Terminal: `cd <repo_path>`
+3. Navigate to the Gravity source folder: `cd gravity`
 3. Ensure that the repository is linked to your site on Netlify: `netlify link`
 4. Run: `netlify graph:edit`
 

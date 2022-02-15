@@ -3,5 +3,5 @@
 
 [build]
   base = "gravity/"
-  publish = "dist/"
+  publish = "gravity/dist/"
   command = "nuxt build"

@@ -3,3 +3,4 @@
 
 [build]
   base = "gravity/"
+  command = "nuxt build"

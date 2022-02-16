@@ -28,6 +28,6 @@ When you link a repository to Netlify, you ensure that there is a direct connect
 
 ![Linking a repository to Netlify](media/gravity-site-link.gif)
 
-Editing the graph with `netlify graph:edit` will allow you to customize the queries aand include any additional information or services that might be needed for your application.
+Editing the graph with `netlify graph:edit` will allow you to customize the queries and include any additional information or services that might be needed for your application.
 
 ![Editing GraphQL queries with Netlify Graph](media/gravity-graph-edit.gif)

@@ -44,7 +44,17 @@ export interface EdgeNode {
     title: string;
     url: string;
     state: string;
+    comments: Comments;
+    reactions: Reactions;
     timelineItems: TimelineItems;
+}
+
+export interface Comments {
+    totalCount: number;
+}
+
+export interface Reactions {
+    totalCount: number;
 }
 
 export interface TimelineItems {

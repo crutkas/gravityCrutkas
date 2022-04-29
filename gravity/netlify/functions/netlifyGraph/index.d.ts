@@ -102,6 +102,18 @@ export type GetIssueBreakdown = {
               /**
                * A list of events, comments, commits, etc. associated with the issue.
                */
+              comments: {
+                /**
+                 * Identifies the total count of items in the connection.
+                 */
+                totalCount: number
+              }
+              reactions: {
+                /**
+                 * Identifies the total count of items in the connection.
+                 */
+                totalCount: number
+              }
               timelineItems: {
                 /**
                  * Identifies the total count of items in the connection.

@@ -16,6 +16,12 @@ query GetIssueBreakdown($after: String) @netlify(id: """c67c5c11-cbc4-48ed-8ac8-
             title
             url
             state
+            comments {
+              totalCount
+            }
+            reactions {
+              totalCount
+            }
             timelineItems(first: 200, itemTypes: CROSS_REFERENCED_EVENT) {
               totalCount
               pageInfo {

@@ -82,6 +82,8 @@ export interface IssueSummary {
     title: string;
     url: string;
     referencedIn: number;
+    comments: number;
+    reactions: number;
 }
 
 export interface Relationship {
@@ -216,10 +218,14 @@ function computeSummary(nodeContainer: Array<Edge[]> | null) {
                     url: "",
                     title: "",
                     referencedIn: 0,
+                    comments: 0,
+                    reactions: 0,
                 };
                 summary.url = node.node.url;
                 summary.title = node.node.title;
                 summary.referencedIn = node.node.timelineItems.totalCount;
+                summary.comments = node.node.comments.totalCount;
+                summary.reactions = node.node.reactions.totalCount;
 
                 summaryItems.push(summary);
             });

@@ -22,6 +22,14 @@ export default {
           key: "referencedIn",
           sortable: true,
         },
+        {
+          key: "comments",
+          sortable: true,
+        },
+        {
+          key: "reactions",
+          sortable: true,
+        },
       ],
     };
   },
